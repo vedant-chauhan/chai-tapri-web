@@ -1,0 +1,14 @@
+# Generated / vendored
+pnpm-lock.yaml
+.next/
+.open-next/
+.wrangler/
+cloudflare-env.d.ts
+db/migrations/
+public/
+coverage/
+playwright-report/
+test-results/
+
+# Project docs are hand-formatted (wide tables); don't churn them
+docs/

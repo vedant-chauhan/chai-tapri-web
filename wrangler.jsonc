@@ -1,0 +1,44 @@
+// Cloudflare Workers config (ADR-0012, PHASE-4-FOUNDATION §3/§4, DEPLOYMENT.md slice-1 environments).
+// Top level = local (`wrangler dev`, `opennextjs-cloudflare preview`). `env.staging` / `env.production`
+// are deployed in F4-8. Secrets are never set here: use `wrangler secret put <NAME> --env <env>`
+// (names in .dev.vars.example).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chai-tapri",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-12",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "observability": { "enabled": true },
+  "services": [
+    // Self-reference used by OpenNext caching; must match the worker name.
+    { "binding": "WORKER_SELF_REFERENCE", "service": "chai-tapri" },
+  ],
+  "r2_buckets": [
+    // OpenNext incremental cache (menu pages revalidate without waking the DB).
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "chai-tapri-local-opennext-cache" },
+  ],
+  // Sweep every minute. Cron runs in UTC; business rules use the Australia/Perth clock.
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": { "APP_ENV": "local" },
+
+  "env": {
+    "staging": {
+      "name": "chai-tapri-staging",
+      "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "chai-tapri-staging" }],
+      "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "chai-tapri-staging-opennext-cache" }],
+      "triggers": { "crons": ["* * * * *"] },
+      "vars": { "APP_ENV": "staging" },
+    },
+    "production": {
+      "name": "chai-tapri-production",
+      "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "chai-tapri-production" }],
+      "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "chai-tapri-production-opennext-cache" }],
+      "triggers": { "crons": ["* * * * *"] },
+      "vars": { "APP_ENV": "production" },
+    },
+  },
+}
