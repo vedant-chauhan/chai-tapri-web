@@ -1,6 +1,6 @@
 # Phase 4 — Foundation Plan (low-cost setup)
 
-Status: **Confirmed by the project lead, 20 Oct 2026** (low-cost version). The hosting direction is fixed by ADR-0012 (Cloudflare Workers Paid, approved 20 Oct 2026). ADR-0008…0011 (Neon Free, Resend Free, tooling, GitHub Free) are revised to match and need approval with this plan.
+Status: **Confirmed by the project lead, 20 Oct 2026** (low-cost version). The hosting direction is fixed by ADR-0012 (Cloudflare Workers Paid, approved 20 Oct 2026). ADR-0008…0011 (Neon Free, Resend Free, tooling, GitHub Free) were revised to match and Confirmed with this plan on 20 Oct 2026.
 Owner actions: [setup/OWNER-ACCOUNTS.md](../setup/OWNER-ACCOUNTS.md).
 
 ## 1. Goal and exit criteria
@@ -94,3 +94,27 @@ Build the empty-but-real skeleton that slice 1 is built on. **No customer-facing
 | No enforced merge checks (GitHub Free) | PR-only working rule. Upgrade trigger to Team |
 | Resend 100/day cap | Upgrade trigger before order volume reaches it |
 | Account setup delays / legal entity unconfirmed (Q6) | Local work proceeds. Stripe live activation only blocks launch |
+
+## 7. Local tasks F4-1…F4-6 — status (22 Oct 2026)
+
+Built on branch `phase4/local-foundation` (repo `vedant-chauhan/chai-tapri-web`, private, temporary home until the owner's GitHub org exists, ADR-0011).
+
+| # | Status | Evidence (all run locally on macOS, Node 24.22.1) |
+|---|---|---|
+| F4-1 | Done | `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm cf:build` pass. `wrangler dev` serves `/` with 200 and the security headers. Worker bundle 1.8 MiB gzip (`wrangler deploy --dry-run`) |
+| F4-2 | Done | Vitest (fake clock: `fixedClock` + Vitest fake timers; first domain test = trading-day boundary). Playwright + axe on `/` at 390/1280 px. `docker-compose.yml` (Postgres 16 + Neon wsproxy) written, **not run** (no Docker on this machine) |
+| F4-3 | Done | Drizzle schema + migrations `0000_foundation` (`store_settings`, `cron_heartbeats`), `0001_store_settings_row` (singleton), applied on a fresh DB by test and by `pnpm db:migrate`. Zod env validation (secrets required when `APP_ENV` is preview/staging/production) |
+| F4-4 | Done (see open point 3) | Integration tests on real Postgres: health 200 / 503 (no DB, DB down, sweep never ran, lag > 5 min); cron 401 (no secret, wrong secret, no `CRON_SECRET` configured), 200 writes the heartbeat. `wrangler dev --test-scheduled`: `scheduled()` → internal `POST /api/cron/sweep` with the bearer → route runs |
+| F4-5 | Done (see open point 3) | Integration tests: anonymous → sign-in redirect; staff OK; owner/manager without TOTP → forced enrolment; user without role → forbidden; TOTP enrol then second-factor sign-in; sign-up disabled; capability checks for staff routes. `create-owner` CLI (hidden prompt, min 12 chars, no password argument). E2E: `/admin` → sign-in, forms labelled, keyboard order, axe clean |
+| F4-6 | Done (photos pending) | Header unit test + E2E header check. `.env.example` / `.dev.vars.example` (names only). Dependabot (weekly, 7-day cooldown). gitleaks: history and tree clean. `pnpm audit` clean (1 override + 2 reviewed exceptions, see `pnpm-workspace.yaml`). Image script tested on 20 generated photos (all widths × AVIF/WebP, EXIF rotation, metadata stripped, no upscaling); **real run waits for the owner's photos** in `assets-src/menu/` |
+
+### Deviations from the plan (for the project lead's review)
+1. **Cache Components off.** With `cacheComponents: true` (a create-next-app 16.4 default, not a documented decision) every page hung in the Workers runtime (OpenNext Cloudflare 1.20.12 + Next 16.4.2). It's off; caching uses the classic `revalidate`/`revalidateTag` model, which OpenNext supports. Revisit when OpenNext supports Cache Components. `[Verified locally]`
+2. **CSP without nonces.** SECURITY.md's general plan says "Strict CSP (nonce-based)". Next.js nonces need Proxy (Node-only in Next 16, unsupported on OpenNext Cloudflare) and force every page to render dynamically, which conflicts with the cached menu. The baseline is a static CSP from `next.config.ts`: `default-src 'self'`, scripts only from our origin (+ `'unsafe-inline'` for Next's inline bootstrap), `object-src 'none'`, `frame-ancestors 'none'`, no third-party origins yet. `[Recommendation]` accept for slice 1; revisit if Next ships hash-based CSP for the App Router.
+3. **Auth table names.** Better Auth's tables are stored as `staff_users`, `staff_sessions`, `staff_accounts`, `staff_verifications`, `staff_two_factors`, `auth_rate_limits` (DATABASE.md §6 conventions), plus `staff_roles` as designed. Ids are app-generated UUID strings.
+4. **Rate limiting** for sign-in/TOTP (5/min) uses Better Auth's limiter with Postgres storage, so it holds across Worker isolates.
+
+### Open points
+1. **Owner's menu photos** → `assets-src/menu/`, then `pnpm images` (originals stay out of git; usage rights F9).
+2. **Staff TOTP optional** remains the slice-1 `[Assumption]`; manager/owner TOTP is enforced.
+3. **Not yet exercised against a database inside the Workers runtime** (Neon driver over WebSockets): heartbeat written by the Cron Trigger, sign-in through the browser. Needs Docker (`docker compose up`) or the Neon account (F4-9). The same code paths are covered by integration tests on real Postgres.
