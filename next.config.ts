@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { securityHeaders } from "./src/lib/security-headers";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -9,6 +10,17 @@ const nextConfig: NextConfig = {
   // OpenNext supports them. Caching uses the classic model (revalidate / revalidateTag) instead.
   cacheComponents: false,
   poweredByHeader: false,
+  images: {
+    // No paid image service (ADR-0010): photos are pre-resized by `pnpm images` and a custom loader picks the width.
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
+    // srcset widths = the variants `pnpm images` produces (src/lib/image-variants.ts).
+    deviceSizes: [360, 720, 1080, 1440],
+    imageSizes: [180],
+  },
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders({ isDev }) }];
+  },
   turbopack: {
     rules: {
       "*.css": {

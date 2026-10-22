@@ -1,0 +1,36 @@
+# Dependency updates (ADR-0010, SECURITY.md "Supply chain"). Every update is a PR that must pass CI and be reviewed.
+version: 2
+updates:
+  - package-ecosystem: npm # covers pnpm (reads pnpm-lock.yaml)
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Perth
+    open-pull-requests-limit: 5
+    # Let new releases age a week before proposing them (supply-chain caution).
+    cooldown:
+      default-days: 7
+    groups:
+      next-react:
+        patterns: ["next", "eslint-config-next", "react", "react-dom", "@types/react", "@types/react-dom"]
+      cloudflare:
+        patterns: ["@opennextjs/cloudflare", "wrangler"]
+      dev-tooling:
+        dependency-type: development
+        update-types: ["minor", "patch"]
+    ignore:
+      # Next.js minor is pinned by ADR-0010; bump it deliberately, not via Dependabot.
+      - dependency-name: next
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: eslint-config-next
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Perth
+    cooldown:
+      default-days: 7

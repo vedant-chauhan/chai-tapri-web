@@ -1,0 +1,31 @@
+# Names only — never put real values in this file (PHASE-4-FOUNDATION exit criterion 3).
+# This copy is for `wrangler dev` / `pnpm preview`: save it as .dev.vars (git-ignored).
+# Note: the Worker reaches Postgres through the Neon driver, so a local database needs the
+# docker compose wsproxy (see docker-compose.yml) or a Neon dev branch.
+# Deployed values live in Wrangler secrets (`wrangler secret put NAME --env staging|production`)
+# and GitHub Actions secrets. Validated by src/lib/env.ts.
+
+# local | test | preview | staging | production  (wrangler.jsonc sets it per environment)
+APP_ENV=
+# debug | info | warn | error
+LOG_LEVEL=
+
+# Postgres. Local: docker compose (postgres://chai:chai@localhost:5432/chai_tapri) or a Neon dev branch.
+DATABASE_URL=
+
+# Better Auth. AUTH_SECRET: `openssl rand -base64 32`. AUTH_URL: the app's public origin.
+AUTH_SECRET=
+AUTH_URL=
+
+# Bearer token for POST /api/cron/sweep. `openssl rand -hex 32`.
+CRON_SECRET=
+
+# --- Later tasks (not read yet) ---
+# F4-10 Stripe (test keys outside production)
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+# F4-11 Resend + Sentry
+EMAIL_API_KEY=
+SENTRY_DSN=
+

@@ -1,0 +1,19 @@
+# Secret scanning (SECURITY.md "Secrets leakage"). Runs in CI (F4-7) and locally:
+#   gitleaks git --redact -v .      (committed history: what CI checks)
+#   gitleaks dir --redact -v .      (working tree)
+title = "chai-tapri"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Names-only example env files; git-ignored dependencies and build output (generated keys never leave the machine)"
+paths = [
+  '''(^|/)\.env\.example$''',
+  '''(^|/)\.dev\.vars\.example$''',
+  '''(^|/)node_modules/''',
+  '''(^|/)\.next/''',
+  '''(^|/)\.open-next/''',
+  '''(^|/)\.wrangler/''',
+  '''(^|/)(test-results|playwright-report)/''',
+]

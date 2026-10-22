@@ -17,6 +17,19 @@ test.describe("home page smoke", () => {
     expect(results.violations).toEqual([]);
   });
 
+  test("sends the security headers baseline", async ({ request }) => {
+    const response = await request.get("/");
+    const headers = response.headers();
+    expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(headers["content-security-policy"]).not.toContain("unsafe-eval");
+    expect(headers["strict-transport-security"]).toContain("max-age=63072000");
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["permissions-policy"]).toContain("camera=()");
+    expect(headers["x-powered-by"]).toBeUndefined();
+  });
+
   test("Tab moves through the page without trapping focus", async ({ page }) => {
     await page.goto("/");
     // The holding page has no interactive elements yet. Slice 1 replaces this with real focus-order checks.
