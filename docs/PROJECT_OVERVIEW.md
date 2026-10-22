@@ -2,7 +2,7 @@
 
 **Phase:** 4 — Foundation, **in progress** (started 20 Oct 2026). Local tasks F4-1…F4-6 first; cloud tasks F4-7…F4-12 wait for the owner's accounts.
 **History:** Phase 1 discovery delivered 14 Oct 2026. Phases 1→2→3 approved by the project lead on 15 Oct 2026 (ADR-0001…0007 and the design direction Confirmed). Slice-1 design approved 19 Oct 2026. Unanswered follow-ups (F1–F11, Q6, Q10) are **explicitly deferred** with labelled assumptions in the slice design.
-**Next gate:** approval of the [Phase 4 foundation plan](design/PHASE-4-FOUNDATION.md) (low-cost version, incl. ADR-0008…0011; hosting fixed by ADR-0012) → Phase 4 starts. Local scaffolding (F4-1…F4-6) can begin immediately. Cloud steps wait for the owner's accounts ([setup/OWNER-ACCOUNTS.md](setup/OWNER-ACCOUNTS.md)).
+**Next gate:** Phase 4 exit (criteria 1–7 in the [Phase 4 plan](design/PHASE-4-FOUNDATION.md)). Local tasks F4-1…F4-6 are built (22 Oct 2026); cloud tasks F4-7…F4-12 wait for the owner's accounts ([setup/OWNER-ACCOUNTS.md](setup/OWNER-ACCOUNTS.md)). Two implementation deviations need the project lead's review: Cache Components off, CSP without nonces ([§7](design/PHASE-4-FOUNDATION.md#7-local-tasks-f4-1f4-6--status-22-oct-2026)).
 
 ## Blueprint index
 
@@ -36,10 +36,10 @@
 5. **Regulation changed recently:** card surcharges are banned from 1 Oct 2026. Drip-pricing rules commence 1 Jul 2027. The privacy small-business exemption still exists, but the site should follow APP-level practice anyway.
 6. **Recommended stack:** Next.js + Postgres modular monolith on Cloudflare Workers (changed from Vercel by ADR-0012, 20 Oct 2026), outbox-based integrations, POS adapter with a manual fallback. **Launch pickup ordering first, then delivery.**
 
-## Phase 4 progress (20 Oct 2026)
-- Done: decisions Confirmed. Next.js 16.4.2 scaffold copied into the repo (`package.json`, `src/`, `public/`, configs, `AGENTS.md`). `git init` done (no commits yet). `README.md` with setup steps.
-- Stopped on request: dependency install on this machine. **Development moves to another device.** No `node_modules` or lockfile kept.
-- Next: on the new device, continue F4-1…F4-6 per the [README](../README.md) and [PHASE-4-FOUNDATION §5](design/PHASE-4-FOUNDATION.md). Cloud tasks F4-7…F4-12 wait for the owner's accounts.
+## Phase 4 progress (22 Oct 2026)
+- 20 Oct: decisions Confirmed; Next.js 16.4.2 scaffold copied in.
+- 22 Oct: development resumed on a new machine. Initial commit pushed to a **private temporary repo** `vedant-chauhan/chai-tapri-web` (to be transferred to the owner's GitHub org, ADR-0011). **F4-1…F4-6 built** on branch `phase4/local-foundation`: OpenNext/Wrangler config with staging/production envs and the minute Cron Trigger, Vitest + Playwright/axe, Drizzle + first migrations, health/cron/heartbeat, Better Auth staff sign-in with TOTP and roles, security headers, env examples, Dependabot, gitleaks, image pipeline. All local checks pass. Status, deviations and open points: [PHASE-4-FOUNDATION §7](design/PHASE-4-FOUNDATION.md#7-local-tasks-f4-1f4-6--status-22-oct-2026).
+- Next: review/merge the branch (PR), the owner's menu photos for `pnpm images`, then cloud tasks F4-7…F4-12 once accounts exist.
 
 ## Client answers received 15 Oct 2026
 POS not chosen yet (kept open) · the customer pays delivery · the client already uses Uber Direct · website prices = the in-store menu board (37 items, [MENU.md](MENU.md)) · same-day orders only · ordering stops automatically each night, and the owner can open or close it manually · **staff accept every order** · photos supplied by the owner · allergens to follow. Follow-ups F1–F11 are in [CLIENT_QUESTIONS.md](CLIENT_QUESTIONS.md).

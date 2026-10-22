@@ -1,3 +1,18 @@
 allowBuilds:
   sharp: false
   unrs-resolver: false
+  esbuild: true
+  workerd: true
+
+# Supply-chain caution: don't resolve versions published in the last 3 days.
+minimumReleaseAge: 4320
+
+# Patched transitive versions (pnpm audit, 22 Oct 2026).
+overrides:
+  "glob@>=10.2.0 <10.5.0": "^10.5.0" # GHSA-5j98-mcp5-4vw2, via @opennextjs/aws > @node-minify/core
+
+# Reviewed audit exceptions: build/dev tooling only, never in the Worker bundle. Re-check on every bump.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-67mh-4wv8-2f99 # esbuild 0.18 dev-server CORS, via drizzle-kit > @esbuild-kit; we never run esbuild's server
+    - GHSA-vfj7-8cjw-p6xm # braces ReDoS, via eslint-config-next (lint only); no patched release exists

@@ -24,6 +24,8 @@ Status: general plan **Proposed**; **slice-1 section Confirmed 19 Oct 2026**. Ta
 ## Headers & platform
 HSTS (preload after stabilising), CSP, `X-Content-Type-Options`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (deny camera/mic/geolocation except where needed), `frame-ancestors 'none'` (except provider 3DS frames per their docs).
 
+Phase-4 implementation (22 Oct 2026, `src/lib/security-headers.ts`, for review): all of the above are sent on every route. The CSP is **static, not nonce-based**: Next.js nonces need Proxy, which OpenNext Cloudflare doesn't support, and would force every page to render dynamically (no cached menu). Scripts are limited to our own origin plus `'unsafe-inline'` for Next's inline bootstrap; React escaping and "no HTML rendering of user text" remain the XSS controls. Slice 1 adds the Stripe origins. See PHASE-4-FOUNDATION §7.
+
 ## Operational security
 - Owner holds the provider accounts (Stripe/Square, Uber Direct, domain, Cloudflare, Neon, GitHub) under **business** email with MFA. The developer gets delegated access, not shared passwords.
 - Access review quarterly and on staff/vendor change.

@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens: "The Tapri, after dark" (DESIGN_DIRECTION.md §4, Confirmed 15 Oct 2026).
+ * [Assumption] Colour values are the documented starting points. Replace them with values
+ * sampled from the vector logo when it arrives (CLIENT_QUESTIONS Q13), and re-check contrast.
+ * Contrast on --ground (checked 22 Oct 2026): ink 14.2:1, accent 6.8:1, success 5.3:1, warning 5.0:1.
+ *
+ * Rules: one ground / ink / accent. The accent is for actions only (Order, Add, Pay) and the
+ * open-status dot. Saffron is the brand colour for the wordmark and at most one highlight,
+ * never buttons. Surfaces are separated by a tone step, not lines or shadows.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ground: #f4ebdd; /* warm chai-milk cream: page background */
+  --ink: #2a1a12; /* deep tea-brown text */
+  --accent: #9e1b1e; /* Tapri maroon: actions + focus rings */
+  --accent-ink: #f4ebdd; /* text on accent */
+  --brand: #e07a1f; /* saffron from the "CHAI" wordmark: logo/graphics only. 2.55:1 on ground, so never text */
+  --surface: #eadfcc; /* cards/sheets: one step darker than ground */
+  --night: #1e140f; /* the one full-bleed dark section */
+  --night-ink: #f4ebdd;
+  --success: #3f6b3a; /* status colours always come with an icon + text */
+  --warning: #8a5a00;
+  --danger: var(--accent);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ground: var(--ground);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-brand: var(--brand);
+  --color-surface: var(--surface);
+  --color-night: var(--night);
+  --color-night-ink: var(--night-ink);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Text/UI face. The display face is chosen later (DESIGN_DIRECTION §3 candidates). */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* At most 5 type sizes per page (DESIGN_DIRECTION §3). */
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem; /* 17 px body */
+  --text-lg: 1.375rem;
+  --text-xl: 2rem;
+  --text-display: clamp(2.5rem, 6vw + 1rem, 5.5rem);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+/* Visible focus in the accent colour (DESIGN_DIRECTION §5). */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* CSS-first motion (ADR-0007): animate transform/opacity only, and respect reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
