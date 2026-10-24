@@ -7,10 +7,9 @@ import type { Auth } from "./auth";
 import { can, type Capability } from "./capabilities";
 import { loadStaffIdentity } from "./session";
 import { ApiError } from "@/lib/errors";
-import type { Db } from "@/server/db/types";
 
-export async function requireCapability(auth: Auth, db: Db, headers: Headers, capability: Capability) {
-  const decision = decideAdminAccess(await loadStaffIdentity(auth, db, headers));
+export async function requireCapability(auth: Auth, headers: Headers, capability: Capability) {
+  const decision = decideAdminAccess(await loadStaffIdentity(auth, headers));
   if (decision.kind === "redirect" && decision.reason === "no_session") throw new ApiError("unauthenticated");
   if (decision.kind === "redirect") {
     throw new ApiError("forbidden", { message: "Set up two-step sign-in before using the order screen." });

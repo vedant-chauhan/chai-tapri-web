@@ -13,9 +13,7 @@ const accessFor = cache(async (enforceMfa: boolean): Promise<AccessDecision> => 
   if (!hasSessionCookie) return { kind: "redirect", to: SIGN_IN_PATH, reason: "no_session" };
 
   const requestHeaders = await headers();
-  return withAuth(async ({ auth, db }) =>
-    decideAdminAccess(await loadStaffIdentity(auth, db, requestHeaders), { enforceMfa }),
-  );
+  return withAuth(async ({ auth }) => decideAdminAccess(await loadStaffIdentity(auth, requestHeaders), { enforceMfa }));
 });
 
 /**

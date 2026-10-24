@@ -48,6 +48,11 @@ export function createAuth({ db, secret, baseURL, rateLimit = true }: AuthConfig
     user: {
       changeEmail: { enabled: false },
       deleteUser: { enabled: false },
+      additionalFields: {
+        // Staff role (staff_users.role). `input: false`: never settable through Better Auth's endpoints,
+        // only by our own server code (create-owner CLI, the owner's staff screen).
+        role: { type: "string", required: false, input: false },
+      },
     },
     session: {
       expiresIn: SESSION_TTL_SECONDS,

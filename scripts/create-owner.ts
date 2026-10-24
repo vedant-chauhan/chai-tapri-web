@@ -60,7 +60,7 @@ async function main() {
       baseURL: process.env.AUTH_URL ?? "http://localhost:3000",
       rateLimit: false,
     });
-    const { userId } = await createStaffUser(auth, conn.db, {
+    const { userId } = await createStaffUser(auth, {
       email: values.email,
       name: values.name,
       password,

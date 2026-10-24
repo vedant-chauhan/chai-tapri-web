@@ -5,8 +5,7 @@
  */
 import type { Auth } from "./auth";
 import { MIN_PASSWORD_LENGTH } from "./auth";
-import { staffRoles, type StaffRole } from "@/server/db/schema";
-import type { Db } from "@/server/db/types";
+import type { StaffRole } from "@/server/db/schema";
 
 export class CreateStaffUserError extends Error {
   constructor(
@@ -25,7 +24,7 @@ export interface NewStaffUser {
   role: StaffRole;
 }
 
-export async function createStaffUser(auth: Auth, db: Db, input: NewStaffUser): Promise<{ userId: string }> {
+export async function createStaffUser(auth: Auth, input: NewStaffUser): Promise<{ userId: string }> {
   const email = input.email.trim().toLowerCase();
   const name = input.name.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
@@ -40,13 +39,15 @@ export async function createStaffUser(auth: Auth, db: Db, input: NewStaffUser): 
     throw new CreateStaffUserError("email_taken", "A staff account with this email already exists.");
   }
 
-  const user = await ctx.internalAdapter.createUser({ email, name, emailVerified: true }, { method: "admin" });
+  const user = await ctx.internalAdapter.createUser(
+    { email, name, emailVerified: true, role: input.role },
+    { method: "admin" },
+  );
   await ctx.internalAdapter.linkAccount({
     userId: user.id,
     providerId: "credential",
     accountId: user.id,
     password: await ctx.password.hash(input.password),
   });
-  await db.insert(staffRoles).values({ userId: user.id, role: input.role });
   return { userId: user.id };
 }

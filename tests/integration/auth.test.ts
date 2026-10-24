@@ -5,7 +5,7 @@ import { createAuth, type Auth } from "@/server/auth/auth";
 import { createStaffUser, CreateStaffUserError } from "@/server/auth/create-staff-user";
 import { requireCapability } from "@/server/auth/require-staff";
 import { loadStaffIdentity } from "@/server/auth/session";
-import { staffAccounts, staffRoles, staffUsers } from "@/server/db/schema";
+import { staffAccounts, staffUsers } from "@/server/db/schema";
 import { createTestDb, type TestDb } from "../support/db";
 import { secretFromOtpauthUri, totp } from "../support/totp";
 
@@ -49,15 +49,15 @@ async function signIn(email: string, password = PASSWORD) {
 }
 
 async function decisionFor(jar: Jar, opts?: { enforceMfa?: boolean }) {
-  return decideAdminAccess(await loadStaffIdentity(auth, t.db, jar.headers()), opts);
+  return decideAdminAccess(await loadStaffIdentity(auth, jar.headers()), opts);
 }
 
 beforeAll(async () => {
   t = await createTestDb();
   auth = createAuth({ db: t.db, secret: "test-secret-".padEnd(48, "x"), baseURL: ORIGIN, rateLimit: false });
-  await createStaffUser(auth, t.db, { email: "Owner@Example.com", name: "Owner", password: PASSWORD, role: "owner" });
-  await createStaffUser(auth, t.db, { email: "staff@example.com", name: "Staff", password: PASSWORD, role: "staff" });
-  await createStaffUser(auth, t.db, {
+  await createStaffUser(auth, { email: "Owner@Example.com", name: "Owner", password: PASSWORD, role: "owner" });
+  await createStaffUser(auth, { email: "staff@example.com", name: "Staff", password: PASSWORD, role: "staff" });
+  await createStaffUser(auth, {
     email: "manager@example.com",
     name: "Manager",
     password: PASSWORD,
@@ -76,16 +76,15 @@ describe("createStaffUser (create-owner CLI core)", () => {
     const [account] = await t.db.select().from(staffAccounts).where(eq(staffAccounts.userId, user.id));
     expect(account.providerId).toBe("credential");
     expect(account.password).not.toContain(PASSWORD);
-    const [role] = await t.db.select().from(staffRoles).where(eq(staffRoles.userId, user.id));
-    expect(role.role).toBe("owner");
+    expect(user.role).toBe("owner");
   });
 
   it("refuses short passwords and duplicate emails", async () => {
     await expect(
-      createStaffUser(auth, t.db, { email: "x@example.com", name: "X", password: "short", role: "staff" }),
+      createStaffUser(auth, { email: "x@example.com", name: "X", password: "short", role: "staff" }),
     ).rejects.toMatchObject({ code: "weak_password" });
     await expect(
-      createStaffUser(auth, t.db, { email: "owner@example.com", name: "Dup", password: PASSWORD, role: "staff" }),
+      createStaffUser(auth, { email: "owner@example.com", name: "Dup", password: PASSWORD, role: "staff" }),
     ).rejects.toBeInstanceOf(CreateStaffUserError);
   });
 });
@@ -126,12 +125,20 @@ describe("admin guard (F4-5 acceptance)", () => {
     expect(await decisionFor(jar)).toMatchObject({ kind: "redirect", to: TWO_FACTOR_ENROL_PATH });
   });
 
-  it("signed-in user without a staff role → forbidden", async () => {
-    const [owner] = await t.db.select().from(staffUsers).where(eq(staffUsers.email, "staff@example.com"));
+  it("signed-in user whose staff access was removed (role null) → forbidden", async () => {
     const { jar } = await signIn("staff@example.com");
-    await t.db.delete(staffRoles).where(eq(staffRoles.userId, owner.id));
+    await t.db.update(staffUsers).set({ role: null }).where(eq(staffUsers.email, "staff@example.com"));
     expect(await decisionFor(jar)).toMatchObject({ kind: "forbidden" });
-    await t.db.insert(staffRoles).values({ userId: owner.id, role: "staff" });
+    await t.db.update(staffUsers).set({ role: "staff" }).where(eq(staffUsers.email, "staff@example.com"));
+  });
+
+  it("the role can't be set through Better Auth's own endpoints", async () => {
+    const { jar } = await signIn("staff@example.com");
+    await auth.api
+      .updateUser({ body: { name: "Staff", role: "owner" } as never, headers: jar.headers() })
+      .catch(() => {});
+    const [user] = await t.db.select().from(staffUsers).where(eq(staffUsers.email, "staff@example.com"));
+    expect(user.role).toBe("staff");
   });
 });
 
@@ -179,19 +186,19 @@ describe("TOTP enrolment and second-factor sign-in", () => {
 
 describe("requireCapability (staff route handlers)", () => {
   it("401 anonymous, 403 missing capability, OK when allowed", async () => {
-    await expect(requireCapability(auth, t.db, new Jar().headers(), "board.view")).rejects.toMatchObject({
+    await expect(requireCapability(auth, new Jar().headers(), "board.view")).rejects.toMatchObject({
       code: "unauthenticated",
     });
     const { jar } = await signIn("staff@example.com");
-    await expect(requireCapability(auth, t.db, jar.headers(), "board.view")).resolves.toMatchObject({ role: "staff" });
-    await expect(requireCapability(auth, t.db, jar.headers(), "ordering.open")).rejects.toMatchObject({
+    await expect(requireCapability(auth, jar.headers(), "board.view")).resolves.toMatchObject({ role: "staff" });
+    await expect(requireCapability(auth, jar.headers(), "ordering.open")).rejects.toMatchObject({
       code: "forbidden",
     });
   });
 
   it("403 for a manager who hasn't enrolled TOTP, even for staff-level actions", async () => {
     const { jar } = await signIn("manager@example.com");
-    await expect(requireCapability(auth, t.db, jar.headers(), "board.view")).rejects.toMatchObject({
+    await expect(requireCapability(auth, jar.headers(), "board.view")).rejects.toMatchObject({
       code: "forbidden",
     });
   });
