@@ -8,11 +8,10 @@ Status: §1–5 = preliminary model for all slices. **§6 = slice-1 schema, Conf
 | Entity | Key fields | Notes |
 |---|---|---|
 | `category` | id, slug, name, sort, is_visible | |
-| `product` | id, category_id, slug, name, description, base_price_cents, product_type (`food`\|`merch` later), is_web_visible, is_available, available_until (sold out "until tomorrow"), dietary_tags[], allergens[] (FSANZ list), image_id, pos_ref, sort | One chai product with size/flavour modifiers instead of 4 near-duplicates |
+| `product` | id, category_id, slug, name, description, base_price_cents, product_type (`food`\|`merch` later), is_web_visible, is_available, available_until (sold out "until tomorrow"), dietary_tags[], allergens[] (FSANZ list), image_key, image_alt, pos_ref, sort | One chai product with size/flavour modifiers instead of 4 near-duplicates |
 | `modifier_group` | id, name, min_select, max_select, sort, pos_ref | e.g. Size (1..1), Add-ons (0..3) |
 | `modifier_option` | id, group_id, name, price_delta_cents, is_available, is_default, pos_ref | |
 | `product_modifier_group` | product_id, group_id, sort | Many-to-many |
-| `media_asset` | id, storage_key, width, height, alt_text, credit, licence_note | Licence note records photo usage rights |
 | `menu_sync_run` | id, source(pos), started_at, finished_at, status, changes_json, error | Only if the POS is the menu master |
 
 ### Operating schedule
@@ -54,7 +53,7 @@ Status: §1–5 = preliminary model for all slices. **§6 = slice-1 schema, Conf
 | Entity | Key fields | Notes |
 |---|---|---|
 | `staff_user`, `session`, `mfa_factor` | (auth library tables) | MFA required for manager/owner |
-| `role`, `staff_role` | roles: `staff`, `manager`, `owner` | Permissions as code-defined capabilities per role (simpler than a permission table at this size) |
+| `staff_user.role` | `staff`, `manager`, `owner` (null = access removed) | Permissions as code-defined capabilities per role (simpler than a permission table at this size) |
 | `audit_log` | id, actor_id, action, entity, entity_id, before_json, after_json, ip_hash, created_at | Hours/price/refund/override/staff changes |
 | `site_notice` | id, message, severity, starts_at, ends_at, placement | "Closed for Diwali" banners |
 | `page_content` | key, fields_json, updated_by | About text, FAQs. A small, structured content model, not a CMS |
@@ -112,13 +111,10 @@ Add `product_type='merch'`, `variant` (size/colour, SKU, stock), `fulfilment='sh
 
 **Conventions:** tables plural `snake_case` (avoids the reserved word `order`). PK `id uuid` (v7, time-ordered) except lookups. Every table has `created_at`/`updated_at timestamptz not null default now()` (omitted below for brevity). Money `*_cents integer` with non-negative checks. Enum-like columns are `text` + `check (col in (…))`, which is easier to migrate than Postgres enums. FKs `on delete restrict` unless stated. Catalogue rows are never hard-deleted: set `archived_at` instead. Drizzle migrations in git, one tool for every environment.
 
+**Simplification (approved by the project lead, 24 Oct 2026):** three tables merged into others to keep the schema small. `staff_roles` → `staff_users.role` (migration 0005, built); `order_item_options` → `order_items.options` (jsonb receipt snapshot); `media_assets` → `products.image_key` + `image_alt` (photo usage rights are recorded once in docs, CLIENT_QUESTIONS F9). **Kept separate on purpose:** `customers` and `payments`. Slice 1 = **26 tables**: 20 below + 6 auth-library tables. Built so far: 12 (store_settings, cron_heartbeats, weekly_hours, date_exceptions, ordering_overrides, audit_log + the 6 auth tables).
+
 ```sql
 -- Catalogue -----------------------------------------------------------------
-create table media_assets (
-  id uuid primary key, storage_key text not null unique, width int not null, height int not null,
-  alt_text text not null, credit text,
-  licence_note text not null);                    -- e.g. 'Owner-supplied 2026-10-15 (F9 pending)'
-
 create table categories (
   id uuid primary key, slug text not null unique, name text not null,
   sort int not null default 0, is_visible boolean not null default true, archived_at timestamptz);
@@ -133,7 +129,10 @@ create table products (
   sold_out_until timestamptz,                     -- null = available; "sold out today" = next 05:00 local
   dietary_tags text[] not null default '{}',
   allergens text[] not null default '{}',         -- FSANZ list; empty until Q10 answered
-  image_id uuid references media_assets(id), sort int not null default 0, archived_at timestamptz);
+  image_key text,                                -- photo slug: public/menu/<image_key>-<width>.avif|webp (pnpm images)
+  image_alt text,                                 -- alt text; required when image_key is set
+  sort int not null default 0, archived_at timestamptz,
+  check (image_key is null or image_alt is not null));
 create index products_category_sort on products (category_id, sort) where archived_at is null;
 
 create table option_groups (
@@ -232,14 +231,11 @@ create table order_items (
   product_id uuid not null references products(id),
   name_snapshot text not null, unit_price_cents_snapshot int not null check (unit_price_cents_snapshot >= 0),
   quantity int not null check (quantity between 1 and 20),
-  line_total_cents int not null check (line_total_cents >= 0), sort int not null);
+  line_total_cents int not null check (line_total_cents >= 0), sort int not null,
+  -- chosen options as a receipt snapshot (validated by Zod on write), e.g.
+  -- [{"optionId":"…","group":"Size","name":"Regular","priceDeltaCents":100,"quantity":1}]
+  options jsonb not null default '[]');
 create index order_items_order on order_items (order_id);
-
-create table order_item_options (
-  id uuid primary key, order_item_id uuid not null references order_items(id) on delete cascade,
-  option_id uuid not null references options(id), group_name_snapshot text not null,
-  name_snapshot text not null, price_delta_cents_snapshot int not null,
-  quantity int not null default 1 check (quantity >= 1));
 
 create table order_events (                               -- append-only
   id bigint generated always as identity primary key, order_id uuid not null references orders(id),
@@ -289,9 +285,10 @@ create index audit_log_entity on audit_log (entity, entity_id);
 
 create table cron_heartbeats (name text primary key, last_run_at timestamptz not null, last_ok boolean not null);
 
--- Staff: users, sessions and 2FA tables come from the auth library (Better Auth), plus:
-create table staff_roles (user_id text primary key,  -- auth library user id
-  role text not null check (role in ('staff','manager','owner')));
+-- Staff: users, sessions, accounts, verifications, 2FA and rate-limit tables come from the auth library
+-- (Better Auth), stored as staff_users, staff_sessions, staff_accounts, staff_verifications,
+-- staff_two_factors, auth_rate_limits. The role is a column on staff_users:
+--   role text check (role is null or role in ('staff','manager','owner'))   -- null = access removed
 ```
 
 **Key decisions in this schema**
