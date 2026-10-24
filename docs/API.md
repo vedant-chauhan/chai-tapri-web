@@ -110,6 +110,8 @@ Allowed only while `pending_payment` or `awaiting_acceptance`. → `200` with th
 
 All staff writes append to `audit_log`. Authorisation is checked server-side per capability (`orders.accept`, `orders.refund`, `ordering.open`, `hours.edit`, …), mapped from role in one module.
 
+**Implementation notes (24 Oct 2026, additive):** `GET /staff/ordering` and the three ordering writes return `{ "status": <store status as in GET /store/status>, "override": { "id", "mode", "startsAt", "endsAt", "endsAtLabel", "untilReopened" } | null }`. `close`/`open` end times must fall within the current trading day (closures beyond it are date exceptions); staff `close` needs an end time ≤ +2 h; `open` needs ≥ the prep time left. A close "until reopened" ends at the next trading-day boundary [Assumption, CLIENT_QUESTIONS F12]. A new override replaces the active one; replaced and cleared rows are kept. Code: `src/server/store/`, `src/app/api/v1/`.
+
 ## Internal
 
 ### Sweep — Cloudflare Cron Trigger every minute (`scheduled()` handler), also exposed as `POST /api/cron/sweep` for local/manual runs (header `Authorization: Bearer $CRON_SECRET`)

@@ -45,7 +45,7 @@ Who can override: owner by default. The owner can grant it to managers `[Assumpt
 | Tuesday (closed) | Status "Closed · opens Wed 11:00". No ordering ahead for Wednesday (same-day only) |
 | Owner taps "Open now until 16:00" on Tuesday | Ordering open until 16:00, then closed automatically |
 | Thu 21:40, owner taps "Keep open until 23:00" past the 21:30 cut-off | Orders accepted until 23:00. Board warns at 22:45 |
-| "Close now, until reopened" at 20:00 Thu | Closed, with a reminder after 60 min. Proposed: a manual close expires at the end of the trading day, so Friday opens automatically at 11:00 `[Assumption — confirm with owner]` |
+| "Close now, until reopened" at 20:00 Thu | Closed, with a reminder after 60 min. Proposed: a manual close expires at the end of the trading day, so Friday opens automatically at 11:00 `[Assumption — confirm with owner, CLIENT_QUESTIONS F12]` (implemented 24 Oct 2026) |
 | Customer on payment page when staff close ordering | Authorisation completes within the hold → order on the board. Staff accept or decline |
 | Order not accepted within `{5}` min | Auto-declined, authorisation released, customer emailed |
 | Uber quotes failing for 5 min | Delivery auto-hidden ("Delivery unavailable right now"). Pickup still works. Staff alerted |

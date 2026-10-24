@@ -118,3 +118,10 @@ Built on branch `phase4/local-foundation` (repo `vedant-chauhan/chai-tapri-web`,
 1. **Owner's menu photos** → `assets-src/menu/`, then `pnpm images` (originals stay out of git; usage rights F9).
 2. **Staff TOTP optional** remains the slice-1 `[Assumption]`; manager/owner TOTP is enforced.
 3. **Not yet exercised against a database inside the Workers runtime** (Neon driver over WebSockets): heartbeat written by the Cron Trigger, sign-in through the browser. Needs Docker (`docker compose up`) or the Neon account (F4-9). The same code paths are covered by integration tests on real Postgres.
+
+### Sequencing decision (project lead, 23 Oct 2026)
+- CI workflow is live (F4-7 part, PR #2): quality, integration (Postgres 16), E2E + axe, gitleaks, all green.
+- **F4-7 repo transfer** to the owner's GitHub org: deferred until the website is fully developed.
+- **F4-8…F4-12** (Cloudflare, Neon, Stripe, Sentry/Resend, exit demo): deferred to later.
+- Next: build the customer-facing site and the live store-status backend locally (slice 1, starting with ROADMAP phase 3 "Content site + live status"). Consequence: no staging URL for client review until F4-8; reviews happen locally or by screen share. Phase 4 exit criteria 3–7 stay open until the cloud tasks run.
+
