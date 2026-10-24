@@ -23,7 +23,7 @@ export function staffRoute(
 ): Promise<Response> {
   return handleRequest(request, ({ log }) =>
     withAuth(async ({ auth, db }) => {
-      const staff = await requireCapability(auth, db, request.headers, capability);
+      const staff = await requireCapability(auth, request.headers, capability);
       return handler({ db, clock: systemClock, log, actor: { userId: staff.userId, role: staff.role } });
     }),
   );

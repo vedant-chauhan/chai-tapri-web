@@ -47,10 +47,11 @@ ADR-0001 to ADR-0007 were **Confirmed on 15 Oct 2026** by the project lead (appr
 - Status: Confirmed (project lead, 20 Oct 2026)
 - Context: ADR-0002 left the provider to phase 4. The project lead chose free tiers where possible (20 Oct 2026).
 - Decision: Neon **Free** in `aws-ap-southeast-2`. Two projects so quotas don't mix: `chai-tapri-prod` (production only) and `chai-tapri-nonprod` (staging, dev and preview branches; 10 branches). Max autoscale capped at 0.25 CU so usage is predictable. Connect from Workers with the **Neon serverless driver** (HTTP for single queries, WebSocket pool per request for interactive transactions), not a long-lived pool.
-- Verified limits (20 Oct 2026): 100 CU-hours per project per month (= 400 h at 0.25 CU), **compute suspended until next month or an upgrade if exceeded**, scale-to-zero after 5 min and it can't be disabled, 1 GB storage per project, 6-hour restore window, no commercial-use restriction stated.
+- Verified limits (20 Oct 2026): 100 CU-hours per project per month (= 400 h at 0.25 CU), **compute suspended until next month or an upgrade if exceeded**, scale-to-zero after 5 min and it can't be disabled, ~~1 GB~~ **0.5 GB storage per project** (corrected 24 Oct 2026 from neon.com/pricing; ample for this shop's data), 6-hour restore window, no commercial-use restriction stated.
 - Main risk: the staff board polls during trading hours (~13 h/day ≈ 395 h/month), which is right at the cap. Mitigations: (1) usage alert at 70% of CU-hours; (2) **upgrade trigger** — move production to Neon Launch (≈ US$11–15/month at the same usage: 100 CU-h × US$0.106) before the first real launch, or as soon as usage trends over 80%; (3) board reads served from a short-lived cache in Workers KV where safe, so polls don't wake the DB (phase-5 optimisation).
 - Also: the 6-hour restore window is weak for production. A nightly logical backup (`pg_dump` from CI to R2) is added in phase 4.
 - Exit: standard Postgres, pg_dump/restore.
+- Re-checked 24 Oct 2026 against Supabase at the project lead's request: Neon kept. Supabase Pro is a fixed US$25/month (vs ≈ US$11–15 usage-based on Neon Launch), its Free plan pauses after a week of inactivity, and its bundled auth/storage/realtime duplicate Better Auth and Cloudflare, which we already use.
 
 ## ADR-0009: Transactional email — Resend Free, Pro at launch
 - Status: Confirmed (project lead, 20 Oct 2026)
