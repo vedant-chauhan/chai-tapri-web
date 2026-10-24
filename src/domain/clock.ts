@@ -103,3 +103,67 @@ export function tradingDate(
   const { date, time } = localParts(instant, timeZone);
   return time < boundary ? previousDate(date) : date;
 }
+
+/** `YYYY-MM-DD` plus `days` calendar days (negative allowed). */
+export function addDays(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+/** ISO weekday (1 = Monday … 7 = Sunday) of a `YYYY-MM-DD` calendar date. */
+export function weekdayOf(date: string): number {
+  const day = new Date(`${date}T00:00:00Z`).getUTCDay();
+  return day === 0 ? 7 : day;
+}
+
+/** Offset of `timeZone` from UTC at `instant`, in milliseconds. */
+function zoneOffsetMs(instant: Date, timeZone: string): number {
+  const f = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+  const p = Object.fromEntries(f.formatToParts(instant).map((x) => [x.type, x.value]));
+  const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second);
+  return asUtc - Math.floor(instant.getTime() / 1000) * 1000;
+}
+
+/**
+ * The instant at which the wall clock in `timeZone` reads `date` + `time`.
+ * `time` is `HH:MM` or `HH:MM:SS` (Postgres `time` columns return the latter).
+ */
+export function zonedInstant(date: string, time: string, timeZone: string = STORE_TIME_ZONE): Date {
+  const [y, mo, d] = date.split("-").map(Number);
+  const [h, mi, s = 0] = time.split(":").map(Number);
+  const wall = Date.UTC(y, mo - 1, d, h, mi, s);
+  // Two passes handle zones whose offset changes around the target (Perth has none, but stay correct).
+  let instant = wall - zoneOffsetMs(new Date(wall), timeZone);
+  instant = wall - zoneOffsetMs(new Date(instant), timeZone);
+  return new Date(instant);
+}
+
+/** "11am", "9:30pm", "12:15am" in the store's time zone (SITEMAP status chip copy). */
+export function timeLabel(instant: Date, timeZone: string = STORE_TIME_ZONE): string {
+  const [hh, mm] = localParts(instant, timeZone).time.split(":").map(Number);
+  const suffix = hh < 12 ? "am" : "pm";
+  const h12 = hh % 12 === 0 ? 12 : hh % 12;
+  return mm === 0 ? `${h12}${suffix}` : `${h12}:${String(mm).padStart(2, "0")}${suffix}`;
+}
+
+const WEEKDAY_NAMES = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/**
+ * When the store next opens, relative to `now`: "5pm today" or "Wed 11am".
+ * Uses the calendar date (what a customer reads on their phone), not the trading day.
+ */
+export function nextOpenLabel(next: Date, now: Date, timeZone: string = STORE_TIME_ZONE): string {
+  const n = localParts(next, timeZone);
+  if (n.date === localParts(now, timeZone).date) return `${timeLabel(next, timeZone)} today`;
+  return `${WEEKDAY_NAMES[n.weekday]} ${timeLabel(next, timeZone)}`;
+}

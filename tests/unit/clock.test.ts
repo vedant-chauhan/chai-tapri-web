@@ -62,3 +62,22 @@ describe("clocks", () => {
     expect(tradingDate(systemClock.now())).toBe("2026-10-17");
   });
 });
+
+describe("zonedInstant / labels", () => {
+  it("converts Perth wall-clock time to an instant", async () => {
+    const { zonedInstant } = await import("@/domain/clock");
+    expect(zonedInstant("2026-10-17", "00:30").toISOString()).toBe("2026-10-16T16:30:00.000Z");
+    expect(zonedInstant("2026-10-17", "00:30:00").toISOString()).toBe("2026-10-16T16:30:00.000Z");
+  });
+
+  it("formats status-chip times", async () => {
+    const { timeLabel, nextOpenLabel } = await import("@/domain/clock");
+    expect(timeLabel(new Date("2026-10-15T13:30:00Z"))).toBe("9:30pm");
+    expect(timeLabel(new Date("2026-10-16T03:00:00Z"))).toBe("11am");
+    expect(timeLabel(new Date("2026-10-16T16:00:00Z"))).toBe("12am");
+    expect(timeLabel(new Date("2026-10-16T04:15:00Z"))).toBe("12:15pm");
+    const now = new Date("2026-10-20T06:00:00Z"); // Tue 14:00
+    expect(nextOpenLabel(new Date("2026-10-21T03:00:00Z"), now)).toBe("Wed 11am");
+    expect(nextOpenLabel(new Date("2026-10-20T09:00:00Z"), now)).toBe("5pm today");
+  });
+});
