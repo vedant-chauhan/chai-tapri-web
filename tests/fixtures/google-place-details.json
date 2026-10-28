@@ -1,0 +1,35 @@
+{
+  "rating": 4.6,
+  "userRatingCount": 214,
+  "googleMapsUri": "https://maps.google.com/?cid=1234567890",
+  "reviews": [
+    {
+      "name": "places/TEST/reviews/1",
+      "relativePublishTimeDescription": "2 weeks ago",
+      "rating": 5,
+      "text": { "text": "Test review one: lovely cutting chai and a warm welcome.", "languageCode": "en" },
+      "authorAttribution": { "displayName": "Test Reviewer A", "uri": "https://www.google.com/maps/contrib/1" },
+      "publishTime": "2026-10-15T09:00:00Z",
+      "googleMapsUri": "https://www.google.com/maps/reviews/1"
+    },
+    {
+      "relativePublishTimeDescription": "a month ago",
+      "rating": 4,
+      "originalText": { "text": "Test review two: the vada pav was great." },
+      "authorAttribution": { "displayName": "Test Reviewer B", "uri": "javascript:alert(1)" },
+      "publishTime": "2026-09-20T09:00:00Z"
+    },
+    { "rating": 5, "authorAttribution": { "displayName": "Rating only, no text" } },
+    {
+      "rating": 3,
+      "text": { "text": "Test review four with a missing author." }
+    },
+    { "rating": 5, "text": { "text": "Test review five." }, "authorAttribution": { "displayName": "E" } },
+    { "rating": 5, "text": { "text": "Test review six." }, "authorAttribution": { "displayName": "F" } },
+    {
+      "rating": 5,
+      "text": { "text": "Test review seven (over the limit)." },
+      "authorAttribution": { "displayName": "G" }
+    }
+  ]
+}

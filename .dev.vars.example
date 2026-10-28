@@ -20,6 +20,10 @@ AUTH_URL=
 # Bearer token for POST /api/cron/sweep. `openssl rand -hex 32`.
 CRON_SECRET=
 
+# Google reviews (ADR-0013): Places API (New) key (secret, restricted) and the shop's Place ID.
+GOOGLE_PLACES_API_KEY=
+GOOGLE_PLACE_ID=
+
 # --- Later tasks (not read yet) ---
 # F4-10 Stripe (test keys outside production)
 STRIPE_SECRET_KEY=

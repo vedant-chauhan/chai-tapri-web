@@ -28,6 +28,7 @@ export const ERROR_STATUS = {
   rate_limited: 429,
   internal: 500,
   payment_unavailable: 503,
+  reviews_unavailable: 503,
 } as const;
 
 export type ErrorCode = keyof typeof ERROR_STATUS;
@@ -51,6 +52,7 @@ const DEFAULT_MESSAGES: Record<ErrorCode, string> = {
   rate_limited: "Too many requests. Please wait a moment and try again.",
   internal: "Something went wrong on our side. Please try again.",
   payment_unavailable: "Payments are unavailable right now. Please try again shortly.",
+  reviews_unavailable: "Google reviews can't be loaded right now.",
 };
 
 export interface ErrorDetail {
