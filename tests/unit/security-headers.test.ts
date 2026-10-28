@@ -31,8 +31,10 @@ describe("security headers (SECURITY.md baseline)", () => {
     expect(contentSecurityPolicy({ isDev: true })).toContain("'unsafe-eval'");
   });
 
-  it("loads no third-party origins yet (Stripe is added in slice 1)", () => {
-    expect(contentSecurityPolicy({ isDev: false })).not.toMatch(/https?:\/\//);
+  it("allows third-party origins only as frames for the map (Stripe is added in slice 1)", () => {
+    const csp = contentSecurityPolicy({ isDev: false });
+    const withOrigins = csp.split("; ").filter((d) => /https?:\/\//.test(d));
+    expect(withOrigins).toEqual(["frame-src https://www.openstreetmap.org"]);
   });
 
   it("HSTS is two years without preload; camera/mic/location are denied", () => {

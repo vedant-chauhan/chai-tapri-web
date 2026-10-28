@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
   // OpenNext supports them. Caching uses the classic model (revalidate / revalidateTag) instead.
   cacheComponents: false,
   poweredByHeader: false,
+  experimental: {
+    // Builds must reflect the source exactly. Turbopack's on-disk build cache served a stale
+    // globals.css (old colour tokens) after a change (24 Oct 2026). CI builds are clean anyway;
+    // this keeps local builds and E2E honest. The dev server keeps its cache.
+    turbopackFileSystemCacheForBuild: false,
+  },
   images: {
     // No paid image service (ADR-0010): photos are pre-resized by `pnpm images` and a custom loader picks the width.
     loader: "custom",

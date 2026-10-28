@@ -10,7 +10,11 @@
  * user text" remain the XSS controls. Revisit if Next ships hash-based CSP for App Router (SRI).
  *
  * Slice 1 adds Stripe origins (js.stripe.com, api.stripe.com, hooks.stripe.com) per Stripe's CSP guide.
+ * Frames: only the embedded map (OpenStreetMap) and, once configured, the franchise Google Form.
  */
+import { FRANCHISE_FORM_URL, MAP_EMBED } from "../domain/business";
+
+export const FRAME_SOURCES: string[] = [MAP_EMBED.origin, ...(FRANCHISE_FORM_URL ? ["https://docs.google.com"] : [])];
 
 export interface SecurityHeaderOptions {
   /** `next dev` needs 'unsafe-eval' for React's debugging features. Never in production builds. */
@@ -25,7 +29,7 @@ export function contentSecurityPolicy({ isDev }: SecurityHeaderOptions): string 
     "img-src": ["'self'", "data:", "blob:"],
     "font-src": ["'self'"],
     "connect-src": ["'self'"],
-    "frame-src": ["'none'"],
+    "frame-src": FRAME_SOURCES.length ? FRAME_SOURCES : ["'none'"],
     "worker-src": ["'self'"],
     "manifest-src": ["'self'"],
     "object-src": ["'none'"],

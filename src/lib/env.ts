@@ -31,6 +31,14 @@ export const envSchema = z.object({
 
   /** Bearer token for POST /api/cron/sweep (the Cron Trigger sends it internally). */
   CRON_SECRET: secret(32).optional(),
+
+  /** Google Places API (New) key: server-only, restricted to the Places API (ADR-0013). Optional. */
+  GOOGLE_PLACES_API_KEY: z.string().min(20).optional(),
+  /** The shop's Google Place ID (storable indefinitely under Google's terms). Optional. */
+  GOOGLE_PLACE_ID: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{10,}$/, "must be a Google Place ID")
+    .optional(),
 });
 
 /** Deployed environments must have every secret; local/test may run without (features degrade, health says 503). */

@@ -29,11 +29,12 @@ Prioritised. Answers are recorded with their date. Confirmed items are carried i
 | F6 | "Can't order for another day": should customers be able to choose a **later time today** (e.g. order at 2pm for 6pm), or **ASAP only**? | Decides whether time slots exist at all | Blocking for ordering |
 | F7 | How long should staff have to **accept** an order before it is automatically declined and the customer's payment released (e.g. 5 minutes)? | Customers shouldn't wait indefinitely. It also keeps delivery quotes valid (Uber quotes expire after 15 min) | Blocking for ordering |
 | F8 | What device will staff use to accept orders (counter tablet, phone, the till screen)? Is a sound alert OK in the shop? Is a kitchen docket printer wanted? | Order-screen design and hardware | Important |
-| F9 | Short written confirmation from the owner that they own or are licensed to use the May 2026 photos on the website | Copyright protection for you and the owner | Important |
+| F9 | Short written confirmation from the owner that they own or are licensed to use the May 2026 photos on the website | Copyright protection for you and the owner | **Answered 24 Oct 2026:** the project lead confirmed the owner has approved using the photos on the website |
 | F10 | When the owner manually keeps ordering open past the cut-off, should it require an end time (e.g. "open until 11:30pm")? (Recommended: yes, so it can't be left open by accident) | Prevents orders after staff go home | Important |
 | F11 | Combo choices, sandwich extras, item descriptions (see MENU.md) | Needed to build the menu correctly | Important |
 | F12 | When the owner taps **"Close now, until I reopen"** and forgets to reopen, should online ordering open again automatically the next morning at the usual time? (Built that way for now: a manual close lasts until the end of that night's trading day, 5am. Staff can only close for up to 2 hours.) | Stops an accidental all-day closure the next day | Important |
 | F13 | Who should be able to **close** online ordering early: any staff member (up to 2 hours), or managers/owner only? And should the owner be able to let managers use **"Open now"** too? (Built for now: staff close ≤ 2 h, managers close any time, only the owner opens.) | Sets who controls ordering during a shift | Important |
+| F14 | **Franchise page:** (1) the Google Form's embed link ("Send → <> embed"), (2) anything you want said about franchising: who you're looking for, regions, investment range, training/support, (3) who reviews the page legally before launch (franchise marketing falls under the Franchising Code of Conduct; earnings or fee claims need care). The page is built with verified facts only and a contact fallback until the form exists | Lets the page collect enquiries and say more than "register your interest" | Important (before launch) |
 
 ## Still open from the original list
 
@@ -44,7 +45,7 @@ Prioritised. Answers are recorded with their date. Confirmed items are carried i
 | Q10 | Allergen and dietary information per item | Launch blocker |
 | Q11 | Budget range for the build and monthly running costs. Target launch date? | Important |
 | Q12 | Who maintains the site after launch? Any technology preference? | Important |
-| Q13 | Logo source files (SVG/AI), brand colours/fonts, the menu-board artwork file (the board exists as a design file somewhere) | Important |
+| Q13 | Logo source files (SVG/AI), brand colours/fonts, the menu-board artwork file (the board exists as a design file somewhere) | **Partly answered 29 Oct 2026:** logo received as a transparent raster (2000×1333). Colours sampled from it (orange `#F47D03`, maroon `#6C2D27`, yellow `#FFD02E`, pink `#D14375`). Still wanted: a vector (SVG/AI) file for sharp printing and the menu-board artwork |
 | Q14 | Half-day atmosphere photo/video shoot? | Important |
 | Q15 | Confirm the hours: Tue closed, Fri–Sat until 1am. Public holiday policy? | Important |
 | Q16 | Founders' story for the About page; staff photos permission | Important |

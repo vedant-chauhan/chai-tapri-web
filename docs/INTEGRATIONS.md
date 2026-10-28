@@ -135,3 +135,7 @@ Facts checked 14 Oct 2026. `[Verified]` = official docs/pages. Everything else i
 - **Email (Resend/Postmark):** order confirmation (tax invoice), status changes, staff alerts. SPF/DKIM/DMARC on the domain.
 - **Google Business Profile:** keep hours consistent with the website (manual at MVP).
 - **Analytics:** privacy-friendly analytics (e.g. Plausible / Cloudflare Web Analytics) without cross-site tracking → no consent banner needed for basic use `[Recommendation]`. Ads pixels (Meta/Google Ads) need a consent decision first.
+
+## Google reviews (Places API), added 29 Oct 2026 (ADR-0013)
+Place Details (New) with field mask `rating,userRatingCount,reviews,googleMapsUri`, called from the Worker on demand (`GET /api/v1/reviews`). No storage (Google terms), attribution shown, 8 s timeout, `503 reviews_unavailable` fallback. Owner setup: OWNER-ACCOUNTS item 9.
+

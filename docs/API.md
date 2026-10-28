@@ -27,6 +27,23 @@ Live ordering status. Short cache (`max-age=10`).
 ```
 Closed example: `{ "open": false, "reason": "outside_hours" | "paused" | "unavailable", "nextOpen": "…", "nextOpenLabel": "Wed 11am", "notice": "Closed for Diwali" }`.
 
+### `GET /api/v1/store/hours` (additive, 24 Oct 2026, for review)
+Shop hours for the Visit page, footer and Home. `public, max-age=300`.
+```json
+{ "week": [ { "weekday": 1, "day": "Mon", "windows": [ { "opens": "11am", "closes": "10pm", "closesNextDay": false } ] }, … ],
+  "todayWeekday": 6, "upcoming": [ { "date": "2026-10-24", "dateLabel": "Sat 24 Oct", "kind": "closed", "windows": [], "note": "Closed for Diwali" } ] }
+```
+Shop hours (doors), not the online-ordering cut-off. `upcoming` = closures/special hours in the next 14 days. In local `next dev` without `DATABASE_URL`, this and `/store/status` serve the seed hours with `x-schedule-source: seed-preview` (never in a production build).
+
+### `GET /api/v1/reviews` (additive, 29 Oct 2026, ADR-0013)
+Live Google reviews, fetched from the Places API on each call (Google's terms forbid storing them; the page calls this only when a visitor taps). `Cache-Control: no-store`.
+```json
+{ "rating": 4.6, "userRatingCount": 214, "googleMapsUri": "https://maps.google.com/?cid=…",
+  "writeReviewUri": "https://search.google.com/local/writereview?placeid=…",
+  "reviews": [ { "author": "…", "authorUri": "https://…", "rating": 5, "relativeTime": "2 weeks ago", "publishTime": "…", "text": "…", "reviewUri": "https://…" } ] }
+```
+Up to 5 reviews, selected by Google; non-https links dropped. `503 reviews_unavailable` when not configured, over the daily quota, or Google fails.
+
 ### `GET /api/v1/menu`
 Categories → products → option groups → options, with `available` flags (sold-out computed server-side), `price` objects, `image` (`src`, `width`, `height`, `alt`), `allergens`, `dietaryTags`. Archived and hidden items are excluded. Sold-out items are included with `available: false`.
 
@@ -122,7 +139,7 @@ In order, each step bounded (≤ 50 rows) and idempotent: expire holds → time 
 `200 { "db": "ok", "stripe": "ok", "sweepLagSeconds": 42 }` for the uptime monitor. `503` if the DB is unreachable or the sweep lags > 5 min. No secrets or PII.
 
 ## Error code catalogue (slice 1)
-`validation_failed` 400 · `unauthenticated` 401 · `forbidden` 403 · `not_found` 404 · `conflict` 409 · `cart_changed` 409 · `ordering_closed` 409 · `not_cancellable` 409 · `accept_deadline_passed` 409 · `payment_not_captured` 409 · `idempotency_mismatch` 422 · `order_limit_exceeded` 422 · `refund_exceeds_captured` 422 · `until_required` 422 · `invalid_hours` 422 · `rate_limited` 429 · `payment_unavailable` 503 · `internal` 500.
+`validation_failed` 400 · `unauthenticated` 401 · `forbidden` 403 · `not_found` 404 · `conflict` 409 · `cart_changed` 409 · `ordering_closed` 409 · `not_cancellable` 409 · `accept_deadline_passed` 409 · `payment_not_captured` 409 · `idempotency_mismatch` 422 · `order_limit_exceeded` 422 · `refund_exceeds_captured` 422 · `until_required` 422 · `invalid_hours` 422 · `rate_limited` 429 · `payment_unavailable` 503 · `reviews_unavailable` 503 (additive) · `internal` 500.
 
 ## Compatibility
 v1 changes are additive only (new optional fields, new endpoints, new error codes the UI treats as `internal`). Breaking changes need `/api/v2` and an ADR.

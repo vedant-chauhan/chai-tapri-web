@@ -92,3 +92,14 @@ The shoot was **commissioned through Uber Eats' SmartShoot programme**, and the 
 - **Menu:** the item shots, one per item. Use one chai image for the four chai variants plus size/flavour selectors.
 - **Order CTA band:** the Cover flat-lay.
 - **About / Visit:** needs new interior, exterior and people photography. Instagram stills are a stop-gap only with permission and adequate resolution.
+
+## Update 24 Oct 2026: photos imported
+- Usage on the website **confirmed** (CLIENT_QUESTIONS F9, via the project lead).
+- Downloaded with the project lead's go-ahead: the **2880×2304 "Selects"** set (21 JPGs, 26 MB) from the SmartShoot review page. The review link stays confidential and is not stored in the repo.
+- The 20 menu photos are in `assets-src/menu/` (originals, git-ignored) and the cover in `assets-src/cover/` (unused for now). `pnpm images` produced 160 web variants (AVIF + WebP, 360–1440 px, metadata stripped, 4.3 MB) in `public/menu/`, which are committed. File-name fixes are mapped in `scripts/images.ts` (CardamonChai → cardamom-chai, JambunMaska → jam-bun-maska, PinkLassi → rose-lassi, Chef'sSpecialSandwich → chefs-special-sandwich).
+
+## Update 29 Oct 2026: logo
+- The client supplied the logo (transparent raster, 2000×1333): chaiwala illustration, "CHAI TAPRI" wordmark with swash, "Northbridge". Source kept in `assets-src/brand/` (git-ignored).
+- `pnpm brand` (`scripts/brand-assets.ts`) cuts it into `public/brand/logo-mark.webp`, `logo-wordmark.webp`, `logo-full.webp` and the browser icons `src/app/icon.png` / `apple-icon.png`. Header: mark + wordmark; footer: full logo on a cream sign. Re-run when a vector file arrives (Q13).
+- Shop-wall poster photos (29 Oct): used as design reference only, not reproduced (third-party artwork). See DESIGN_DIRECTION "Revision, 29 Oct 2026".
+

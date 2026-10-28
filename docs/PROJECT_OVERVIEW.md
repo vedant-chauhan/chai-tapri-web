@@ -41,6 +41,10 @@
 - 22 Oct: development resumed on a new machine. Initial commit pushed to a **private temporary repo** `vedant-chauhan/chai-tapri-web` (to be transferred to the owner's GitHub org, ADR-0011). **F4-1…F4-6 built** on branch `phase4/local-foundation`: OpenNext/Wrangler config with staging/production envs and the minute Cron Trigger, Vitest + Playwright/axe, Drizzle + first migrations, health/cron/heartbeat, Better Auth staff sign-in with TOTP and roles, security headers, env examples, Dependabot, gitleaks, image pipeline. All local checks pass. Status, deviations and open points: [PHASE-4-FOUNDATION §7](design/PHASE-4-FOUNDATION.md#7-local-tasks-f4-1f4-6--status-22-oct-2026).
 - 23 Oct: PR #1 (F4-1…F4-6) and PR #2 (CI workflow) merged; CI green. **Sequencing decision by the project lead:** repo transfer (rest of F4-7) after the website is fully developed; cloud tasks F4-8…F4-12 later. Next: customer-facing site + live store-status backend, built and reviewed locally ([PHASE-4-FOUNDATION §7](design/PHASE-4-FOUNDATION.md#sequencing-decision-project-lead-23-oct-2026)).
 
+## Waiting on the project lead (29 Oct 2026)
+- **Google Places API key** for live Google reviews (ADR-0013). Until it's set, the "Show Google reviews" button stays hidden and the section shows the dated rating + link. Steps: OWNER-ACCOUNTS item 9 (or a temporary developer key in `.env.local`, never shared in chat).
+- **Franchise Google Form link** and franchise details (CLIENT_QUESTIONS F14).
+
 ## Client answers received 15 Oct 2026
 POS not chosen yet (kept open) · the customer pays delivery · the client already uses Uber Direct · website prices = the in-store menu board (37 items, [MENU.md](MENU.md)) · same-day orders only · ordering stops automatically each night, and the owner can open or close it manually · **staff accept every order** · photos supplied by the owner · allergens to follow. Follow-ups F1–F11 are in [CLIENT_QUESTIONS.md](CLIENT_QUESTIONS.md).
 

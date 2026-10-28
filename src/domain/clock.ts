@@ -167,3 +167,20 @@ export function nextOpenLabel(next: Date, now: Date, timeZone: string = STORE_TI
   if (n.date === localParts(now, timeZone).date) return `${timeLabel(next, timeZone)} today`;
   return `${WEEKDAY_NAMES[n.weekday]} ${timeLabel(next, timeZone)}`;
 }
+
+/** "22:00" / "22:00:00" → "10pm"; "21:30" → "9:30pm" (a wall-clock time, no date). */
+export function wallTimeLabel(time: string): string {
+  const [hh, mm] = time.split(":").map(Number);
+  const suffix = hh < 12 ? "am" : "pm";
+  const h12 = hh % 12 === 0 ? 12 : hh % 12;
+  return mm === 0 ? `${h12}${suffix}` : `${h12}:${String(mm).padStart(2, "0")}${suffix}`;
+}
+
+/** "Fri 30 Oct" for a `YYYY-MM-DD` date. */
+export function dateLabel(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  const month = d.toLocaleString("en-AU", { month: "short", timeZone: "UTC" });
+  return `${WEEKDAY_NAMES[weekdayOf(date)]} ${d.getUTCDate()} ${month}`;
+}
+
+export const WEEKDAY_SHORT = WEEKDAY_NAMES;
