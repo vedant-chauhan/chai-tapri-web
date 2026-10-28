@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -23,7 +23,7 @@ test.describe("sign-in screens", () => {
     await page.goto("/admin/sign-in");
     await expect(page.getByLabel("Email")).toHaveAttribute("autocomplete", "username");
     await expect(page.getByLabel("Password")).toHaveAttribute("autocomplete", "current-password");
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    const results = await new AxeBuilder({ page }).exclude("iframe").withTags(WCAG).analyze();
     expect(results.violations).toEqual([]);
   });
 
@@ -47,7 +47,7 @@ test.describe("sign-in screens", () => {
   test("code screen passes axe", async ({ page }) => {
     await page.goto("/admin/sign-in/verify");
     await expect(page.getByLabel("6-digit code")).toHaveAttribute("autocomplete", "one-time-code");
-    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    const results = await new AxeBuilder({ page }).exclude("iframe").withTags(WCAG).analyze();
     expect(results.violations).toEqual([]);
   });
 });

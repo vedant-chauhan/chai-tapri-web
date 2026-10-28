@@ -1,44 +1,57 @@
 @import "tailwindcss";
 
 /*
- * Design tokens: "The Tapri, after dark" (DESIGN_DIRECTION.md §4, Confirmed 15 Oct 2026).
- * [Assumption] Colour values are the documented starting points. Replace them with values
- * sampled from the vector logo when it arrives (CLIENT_QUESTIONS Q13), and re-check contrast.
- * Contrast on --ground (checked 22 Oct 2026): ink 14.2:1, accent 6.8:1, success 5.3:1, warning 5.0:1.
- *
- * Rules: one ground / ink / accent. The accent is for actions only (Order, Add, Pay) and the
- * open-status dot. Saffron is the brand colour for the wordmark and at most one highlight,
- * never buttons. Surfaces are separated by a tone step, not lines or shadows.
+ * Design tokens: "The Tapri, after dark" (DESIGN_DIRECTION.md §4), revised 29 Oct 2026 after client
+ * feedback ("playful and informative, feel like the shop"): the palette of the enamel tin signs on
+ * the shop walls (cream, Tapri red, saffron, mustard, teal) on a cream ground.
+ * Brand orange and maroon sampled from the client's logo, 29 Oct 2026 (raster; re-check if a vector
+ * file arrives, CLIENT_QUESTIONS Q13).
+ * Contrast (29 Oct 2026): ink/paper 16.0, ink/ground 15.4, ink/mustard 9.1, ink/orange 6.1,
+ * cream/teal 7.4, cream/red 6.1, cream/band 9.5, mustard/band 5.6, red/paper 6.3.
+ * Mustard on teal 4.4 and orange on cream 2.5: large display text / the logo only.
  */
 :root {
-  --ground: #f4ebdd; /* warm chai-milk cream: page background */
-  --ink: #2a1a12; /* deep tea-brown text */
-  --accent: #9e1b1e; /* Tapri maroon: actions + focus rings */
-  --accent-ink: #f4ebdd; /* text on accent */
-  --brand: #e07a1f; /* saffron from the "CHAI" wordmark: logo/graphics only. 2.55:1 on ground, so never text */
-  --surface: #eadfcc; /* cards/sheets: one step darker than ground */
-  --night: #1e140f; /* the one full-bleed dark section */
-  --night-ink: #f4ebdd;
-  --success: #3f6b3a; /* status colours always come with an icon + text */
-  --warning: #8a5a00;
+  --ground: #fdf6ea; /* chai-milk cream: page background */
+  --header: #fffcf6; /* lightest cream: sticky header */
+  --paper: #fffbf2; /* white enamel sign */
+  --surface: #f6e7cf; /* warm golden tone step */
+  --ink: #2b1b12; /* deep tea-brown text */
+  --ink-soft: #5a3e2e;
+  --accent: #b3262a; /* Tapri red: actions (Add, Order) + focus rings */
+  --accent-ink: #fff9ef;
+  --brand: #f47d03; /* "CHAI" orange, sampled from the logo (Q13) */
+  --mustard: #e9b949; /* sign yellow */
+  --teal: #1e5a52; /* sign green */
+  --band: #6c2d27; /* "TAPRI" maroon, sampled from the logo (Q13) */
+  --band-ink: #fff4e2;
+  --rust: #7a3b1e; /* worn sign edges */
+  --success: #2f7a3a;
+  --warning: #9a6200;
   --danger: var(--accent);
 }
 
 @theme inline {
   --color-ground: var(--ground);
+  --color-header: var(--header);
   --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-brand: var(--brand);
   --color-surface: var(--surface);
-  --color-night: var(--night);
-  --color-night-ink: var(--night-ink);
+  --color-paper: var(--paper);
+  --color-mustard: var(--mustard);
+  --color-teal: var(--teal);
+  --color-rust: var(--rust);
+  --color-band: var(--band);
+  --color-band-ink: var(--band-ink);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
 
-  /* Text/UI face. The display face is chosen later (DESIGN_DIRECTION §3 candidates). */
+  /* Text/UI face + display face (headings, wordmark). */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), var(--font-geist-sans), ui-sans-serif, sans-serif;
 
   /* At most 5 type sizes per page (DESIGN_DIRECTION §3). */
   --text-sm: 0.875rem;
@@ -46,6 +59,157 @@
   --text-lg: 1.375rem;
   --text-xl: 2rem;
   --text-display: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+
+  --animate-steam: steam 3.2s ease-in-out infinite;
+  --animate-swing: swing 2.4s ease-out 1;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-bump: bump 0.35s ease-out 1;
+}
+
+@keyframes steam {
+  0% {
+    transform: translateY(8px) scaleX(1);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateY(-28px) scaleX(1.25);
+    opacity: 0;
+  }
+}
+/* A sign hung on a nail, nudged once on page load: a damped swing. */
+@keyframes swing {
+  0% {
+    transform: rotate(9deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  45% {
+    transform: rotate(3.5deg);
+  }
+  65% {
+    transform: rotate(-1.8deg);
+  }
+  82% {
+    transform: rotate(0.8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes bump {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+/* Condensed sign lettering (Bricolage width axis). */
+.font-sign {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  line-height: 0.92;
+}
+
+/*
+ * Enamel "tin sign": the boards on the shop's walls. Worn rust edge (a turbulence mask over an
+ * inset ring), four screw holes, and a soft shadow as if hung on brick. Pure CSS, ~1 KB.
+ */
+.tin {
+  --tin-bg: var(--paper);
+  --tin-fg: var(--ink);
+  position: relative;
+  isolation: isolate;
+  border-radius: 14px;
+  background: var(--tin-bg);
+  color: var(--tin-fg);
+  box-shadow:
+    0 1px 0 rgb(43 27 18 / 0.08),
+    0 14px 28px -18px rgb(43 27 18 / 0.55);
+}
+.tin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 7px var(--rust);
+  opacity: 0.55;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 1 1 0 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.tin::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  pointer-events: none;
+  --hole: radial-gradient(circle, rgb(43 27 18 / 0.55) 0 2.5px, rgb(255 255 255 / 0.35) 3px, transparent 3.6px);
+  background:
+    var(--hole) top left / 9px 9px no-repeat,
+    var(--hole) top right / 9px 9px no-repeat,
+    var(--hole) bottom left / 9px 9px no-repeat,
+    var(--hole) bottom right / 9px 9px no-repeat;
+}
+.tin-red {
+  --tin-bg: var(--accent);
+  --tin-fg: var(--accent-ink);
+}
+.tin-teal {
+  --tin-bg: var(--teal);
+  --tin-fg: var(--paper);
+}
+.tin-mustard {
+  --tin-bg: var(--mustard);
+  --tin-fg: var(--ink);
+}
+.tin-saffron {
+  --tin-bg: var(--brand);
+  --tin-fg: var(--ink);
+}
+.tin-ink {
+  --tin-bg: var(--ink);
+  --tin-fg: var(--paper);
+}
+
+/* Native <dialog> as a bottom sheet on phones, a centred card from 640 px. */
+dialog.sheet {
+  margin: auto auto 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 92dvh;
+  border-radius: 18px 18px 0 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+dialog.sheet::backdrop {
+  background: rgb(43 27 18 / 0.55);
+}
+@media (min-width: 640px) {
+  dialog.sheet {
+    margin: auto;
+    max-width: 30rem;
+    border-radius: 18px;
+  }
+}
+dialog.drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: min(26rem, 100%);
+  background: var(--paper);
+  color: var(--ink);
+}
+dialog.drawer::backdrop {
+  background: rgb(43 27 18 / 0.55);
 }
 
 body {
