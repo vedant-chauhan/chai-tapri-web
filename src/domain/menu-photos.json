@@ -1,0 +1,82 @@
+{
+  "bombay-vada-pav": {
+    "width": 2880,
+    "height": 2304
+  },
+  "cardamom-chai": {
+    "width": 2880,
+    "height": 2304
+  },
+  "chefs-special-sandwich": {
+    "width": 2880,
+    "height": 2304
+  },
+  "classic-bun-maska": {
+    "width": 2880,
+    "height": 2304
+  },
+  "classic-vada-pav": {
+    "width": 2880,
+    "height": 2304
+  },
+  "club-sandwich": {
+    "width": 2880,
+    "height": 2304
+  },
+  "double-samosa": {
+    "width": 2880,
+    "height": 2304
+  },
+  "ginger-chai": {
+    "width": 2880,
+    "height": 2304
+  },
+  "jam-bun-maska": {
+    "width": 2880,
+    "height": 2304
+  },
+  "kurkure-chat": {
+    "width": 2880,
+    "height": 2304
+  },
+  "mango-lassi": {
+    "width": 2880,
+    "height": 2304
+  },
+  "masala-chai": {
+    "width": 2880,
+    "height": 2304
+  },
+  "nutella-bun-maska": {
+    "width": 2880,
+    "height": 2304
+  },
+  "rose-lassi": {
+    "width": 2880,
+    "height": 2304
+  },
+  "pudina-chai": {
+    "width": 2880,
+    "height": 2304
+  },
+  "single-samosa": {
+    "width": 2880,
+    "height": 2304
+  },
+  "tapri-special-puff": {
+    "width": 2880,
+    "height": 2304
+  },
+  "veg-grilled-sandwich": {
+    "width": 2880,
+    "height": 2304
+  },
+  "veg-loaded-puff": {
+    "width": 2880,
+    "height": 2304
+  },
+  "veg-maggi": {
+    "width": 2880,
+    "height": 2304
+  }
+}

@@ -19,6 +19,20 @@ import sharp from "sharp";
 import { MENU_IMAGE_FORMATS, MENU_IMAGE_WIDTHS, type MenuImageFormat } from "../src/lib/image-variants";
 
 const SOURCE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"]);
+
+/** Where the pages read which photos exist (committed; `{}` until photos are processed). */
+export const PHOTO_INDEX = "src/domain/menu-photos.json";
+
+/**
+ * SmartShoot file names that don't match the menu (docs/MENU.md "Photo" column):
+ * misspellings and the "Pink Lassi" photo that is the Rose Lassi.
+ */
+export const SLUG_ALIASES: Record<string, string> = {
+  "cardamon-chai": "cardamom-chai",
+  "jambun-maska": "jam-bun-maska",
+  "pink-lassi": "rose-lassi",
+  "chef-s-special-sandwich": "chefs-special-sandwich",
+};
 const QUALITY: Record<MenuImageFormat, number> = { avif: 50, webp: 74 };
 
 export interface ManifestEntry {
@@ -40,14 +54,19 @@ export function slugify(fileName: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export async function processImages(inDir: string, outDir: string): Promise<ManifestEntry[]> {
+export async function processImages(
+  inDir: string,
+  outDir: string,
+  photoIndexPath: string | null = null,
+): Promise<ManifestEntry[]> {
   const files = (await readdir(inDir)).filter((f) => SOURCE_EXTENSIONS.has(path.extname(f).toLowerCase())).sort();
   await mkdir(outDir, { recursive: true });
 
   const manifest: ManifestEntry[] = [];
   const seen = new Set<string>();
   for (const file of files) {
-    const slug = slugify(file);
+    const raw = slugify(file);
+    const slug = SLUG_ALIASES[raw] ?? raw;
     if (!slug) throw new Error(`Can't make a slug from "${file}"`);
     if (seen.has(slug)) throw new Error(`Two source files map to the slug "${slug}"; rename one.`);
     seen.add(slug);
@@ -71,6 +90,10 @@ export async function processImages(inDir: string, outDir: string): Promise<Mani
   }
 
   await writeFile(path.join(outDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  if (photoIndexPath) {
+    const index = Object.fromEntries(manifest.map((m) => [m.slug, { width: m.width, height: m.height }]));
+    await writeFile(photoIndexPath, `${JSON.stringify(index, null, 2)}\n`);
+  }
   return manifest;
 }
 
@@ -85,7 +108,7 @@ async function main() {
     console.error(`No photos found in ${inDir}. Put the owner's menu photos there (jpg/png/webp/tiff).`);
     process.exit(1);
   }
-  const manifest = await processImages(inDir, values.out!);
+  const manifest = await processImages(inDir, values.out!, PHOTO_INDEX);
   console.log(
     `Wrote ${manifest.length * MENU_IMAGE_WIDTHS.length * MENU_IMAGE_FORMATS.length} variants to ${values.out}.`,
   );

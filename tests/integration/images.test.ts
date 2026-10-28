@@ -37,6 +37,50 @@ afterAll(async () => {
   await rm(root, { recursive: true, force: true });
 });
 
+describe("SmartShoot file names map to menu slugs (docs/MENU.md)", () => {
+  it.each([
+    ["CardamonChai.jpg", "cardamom-chai"],
+    ["JambunMaska.jpg", "jam-bun-maska"],
+    ["PinkLassi.jpg", "rose-lassi"],
+    ["Chef'sSpecialSandwich.jpg", "chefs-special-sandwich"],
+  ])("%s → %s", async (file, slug) => {
+    const { SLUG_ALIASES } = await import("../../scripts/images");
+    const raw = slugify(file);
+    expect(SLUG_ALIASES[raw] ?? raw).toBe(slug);
+  });
+
+  it("every photo named in the menu data can be produced from a SmartShoot file name", async () => {
+    const { MENU } = await import("@/domain/menu");
+    const { SLUG_ALIASES } = await import("../../scripts/images");
+    const shootFiles = [
+      "MasalaChai",
+      "GingerChai",
+      "CardamonChai",
+      "PudinaChai",
+      "MangoLassi",
+      "PinkLassi",
+      "ClassicBunMaska",
+      "JambunMaska",
+      "NutellaBunMaska",
+      "ClassicVadaPav",
+      "BombayVadaPav",
+      "SingleSamosa",
+      "DoubleSamosa",
+      "KurkureChat",
+      "TapriSpecialPuff",
+      "VegLoadedPuff",
+      "VegGrilledSandwich",
+      "ClubSandwich",
+      "Chef'sSpecialSandwich",
+      "VegMaggi",
+    ];
+    const producible = new Set(shootFiles.map((f) => SLUG_ALIASES[slugify(`${f}.jpg`)] ?? slugify(`${f}.jpg`)));
+    const wanted = MENU.flatMap((c) => c.items).flatMap((i) => (i.photo ? [i.photo] : []));
+    expect(wanted).toHaveLength(20);
+    for (const slug of wanted) expect(producible.has(slug)).toBe(true);
+  });
+});
+
 describe("slugify", () => {
   it.each([
     ["MasalaChai.JPG", "masala-chai"],
@@ -49,8 +93,11 @@ describe("slugify", () => {
 });
 
 describe("pnpm images (F4-6 acceptance: variants for 20 photos)", () => {
-  it("writes every width × format for every photo, plus a manifest", async () => {
-    const manifest = await processImages(inDir, outDir);
+  it("writes every width × format for every photo, plus a manifest and the page photo index", async () => {
+    const indexPath = path.join(root, "menu-photos.json");
+    const manifest = await processImages(inDir, outDir, indexPath);
+    const index = JSON.parse(await readFile(indexPath, "utf8"));
+    expect(index["masala-chai"]).toEqual({ width: 1200, height: 1600 });
     expect(manifest).toHaveLength(20);
 
     const files = new Set(await readdir(outDir));

@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "bombay-vada-pav",
+    "source": "BombayVadaPav.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "cardamom-chai",
+    "source": "CardamonChai.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "chefs-special-sandwich",
+    "source": "Chef'sSpecialSandwich.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "classic-bun-maska",
+    "source": "ClassicBunMaska.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "classic-vada-pav",
+    "source": "ClassicVadaPav.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "club-sandwich",
+    "source": "ClubSandwich.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "double-samosa",
+    "source": "DoubleSamosa.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "ginger-chai",
+    "source": "GingerChai.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "jam-bun-maska",
+    "source": "JambunMaska.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "kurkure-chat",
+    "source": "KurkureChat.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "mango-lassi",
+    "source": "MangoLassi.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "masala-chai",
+    "source": "MasalaChai.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "nutella-bun-maska",
+    "source": "NutellaBunMaska.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "rose-lassi",
+    "source": "PinkLassi.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "pudina-chai",
+    "source": "PudinaChai.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "single-samosa",
+    "source": "SingleSamosa.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "tapri-special-puff",
+    "source": "TapriSpecialPuff.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "veg-grilled-sandwich",
+    "source": "VegGrilledSandwich.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "veg-loaded-puff",
+    "source": "VegLoadedPuff.jpg",
+    "width": 2880,
+    "height": 2304
+  },
+  {
+    "slug": "veg-maggi",
+    "source": "VegMaggi.jpg",
+    "width": 2880,
+    "height": 2304
+  }
+]
