@@ -80,3 +80,12 @@ ADR-0001 to ADR-0007 were **Confirmed on 15 Oct 2026** by the project lead (appr
 - Trade-offs: ~2–3 extra developer days (OpenNext setup, the scheduled handler, the image pipeline, the Neon driver). Fewer turnkey conveniences than Vercel. Windows dev needs WSL2. Cron runs in UTC (the domain code already works in `Australia/Perth` via the injectable clock).
 - Consequences: replaces "Vercel Cron" with Cron Triggers, `after()` with `ctx.waitUntil()` behind the same interface, and Vercel env vars with Wrangler secrets per environment.
 - Revisit when: OpenNext blocks a needed Next.js feature, or the team prefers paying for Vercel's workflow. Exit: same Next.js code, redeploy to Vercel or a Node host.
+
+## ADR-0013: Google reviews on the website via the Places API, loaded on tap
+- Status: **Confirmed (project lead, 29 Oct 2026)**: option A of four presented (on-tap live reviews / auto-load / links only / Business Profile API).
+- Context: the client wants Google reviews on the site. Google's Places API (New) Place Details returns the rating, review count and up to 5 reviews selected by Google. Terms: attribution required (author name with the review; Google attribution when not on a Google map); no caching or storing of Places content except the Place ID. Pricing (checked 29 Oct 2026): Place Details Enterprise + Atmosphere ≈ US$25 per 1,000 after 1,000 free requests/month `[Verified — Google pricing page]`.
+- Decision: show the dated, manually verified rating by default; fetch live reviews only when a visitor taps "Show Google reviews" (`GET /api/v1/reviews` → Places API from the Worker, key in a header, `no-store`, 8 s timeout). Expected volume stays inside the free tier. Without a key the section falls back to rating + "Read all on Google".
+- Guardrails: the owner's Google Cloud project with billing, the API key restricted to the Places API and kept as a Wrangler secret, a **daily quota cap** (e.g. 50 requests/day) and a budget alert so a bot can't run up a bill (at the cap the section shows its fallback). Reviews are never hand-picked or copied (Google terms; ACL on misleading testimonials).
+- Before launch: replace the text "Google" attribution with Google's official logo asset per the Places attribution guidelines.
+- Revisit when: traffic makes taps exceed the free tier, or Google changes the terms or pricing.
+

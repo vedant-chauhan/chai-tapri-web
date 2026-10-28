@@ -88,3 +88,15 @@ Purposeful motion only:
 
 ## 9. Explicit anti-patterns (design QA checklist)
 No gradient blobs · no glassmorphism / backdrop-blur nav · no floating pill nav · no eyebrow pill labels · no rows of icon cards · no "01/02/03" numbering · no stock spice-market photos · no mandala/paisley wallpaper · no auto-playing sound · no carousels for core content · no hero text over busy photos · no more than one accent colour.
+
+## Revision, 29 Oct 2026: "the tapri wall" (client feedback)
+
+The client found the first build too plain and asked for a site that is **playful and informative and feels like the shop**. They shared photos of the enamel tin signs on the shop walls. Changes to the rules above:
+
+- **Visual language:** original enamel "tin signs" (rusty worn edge, four screw holes, soft wall shadow) in the shop's sign palette: cream, Tapri red, saffron, mustard `#E9B949`, teal `#1E5A52`. More than one colour now carries large signs; red stays the only colour for actions (Add, Order). Contrast checked for every text pairing (see `globals.css`).
+- **Logo + colours:** the client's logo is now in the header (mark + wordmark) and footer (full lockup on a cream sign). Brand orange `#F47D03` and maroon `#6C2D27` are sampled from it; the footer band uses the maroon.
+- **Type:** Bricolage Grotesque's width axis gives condensed, uppercase sign lettering (`.font-sign`) without a third family.
+- **Motion (CSS only, no libraries, off for reduced motion):** steam rising from the chai photo, the door sign swinging once on load, a scrolling street-banner strip, a bump on the cart count. The rule "≥ 8 moving elements" is still rejected; each motion has a reason.
+- **Informative content:** a "Chai 101" wall explains cutting, tapri, bun maska and vada pav, with real prices from the board. Copy is draft for the owner's sign-off; dish explanations are general, not recipe claims.
+- **Not used:** the photos of the third-party posters in the shop (film stills, an artist-signed print, mass-market designs). Reproducing them online risks copyright and personality-rights claims. The signs on the site are original and belong to Chai Tapri. If the owner wants the real interior on the site, the planned atmosphere shoot (§5) is the way to do it.
+
