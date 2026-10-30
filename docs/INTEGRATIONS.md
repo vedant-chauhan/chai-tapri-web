@@ -19,6 +19,8 @@ Facts checked 14 Oct 2026. `[Verified]` = official docs/pages. Everything else i
 ## 2. POS integration
 
 ### 2.1 What we know
+> **Update 31 Oct 2026:** the project lead asked for Square POS + Uber Direct. Plan and new findings (Square's DELIVERY fulfilment is partners-only; delayed-capture visibility to be tested) are in [design/SQUARE-UBER-INTEGRATION.md](design/SQUARE-UBER-INTEGRATION.md), ADR-0014/0015 (Proposed).
+
 **The client hasn't chosen a POS yet (answer of 15 Oct 2026, kept open).** The tablet visible on the counter in Instagram footage may be a payment terminal or a temporary setup. Consequence: **MVP launches on pattern P3** (staff order board, which staff use anyway because they accept every order). The `PosAdapter` is implemented once a POS is chosen. If the client wants a recommendation, choose a POS with an open ordering API and AU support (e.g. Square, or Lightspeed via its partner programme) and compare total cost including payments.
 
 ### 2.2 Information needed (ask the client and the POS vendor)

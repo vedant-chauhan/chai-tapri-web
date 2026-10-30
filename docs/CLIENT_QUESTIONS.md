@@ -35,12 +35,15 @@ Prioritised. Answers are recorded with their date. Confirmed items are carried i
 | F12 | When the owner taps **"Close now, until I reopen"** and forgets to reopen, should online ordering open again automatically the next morning at the usual time? (Built that way for now: a manual close lasts until the end of that night's trading day, 5am. Staff can only close for up to 2 hours.) | Stops an accidental all-day closure the next day | Important |
 | F13 | Who should be able to **close** online ordering early: any staff member (up to 2 hours), or managers/owner only? And should the owner be able to let managers use **"Open now"** too? (Built for now: staff close ≤ 2 h, managers close any time, only the owner opens.) | Sets who controls ordering during a shift | Important |
 | F14 | **Franchise page:** (1) the Google Form's embed link ("Send → <> embed"), (2) anything you want said about franchising: who you're looking for, regions, investment range, training/support, (3) who reviews the page legally before launch (franchise marketing falls under the Franchising Code of Conduct; earnings or fee claims need care). The page is built with verified facts only and a contact fallback until the form exists | Lets the page collect enquiries and say more than "register your interest" | Important (before launch) |
+| F15 | **Merchandise:** what's planned (items, sizes, prices, photos), when, and whether it's sold online for pickup only or also posted? The `/merch` page is a "coming soon" placeholder that names no products until you decide | Lets merch join the menu and cart when ready | Later |
+| F16 | **Square:** (1) Does the shop already use Square POS, and on which plan (Free, Plus, Square for Restaurants)? Kitchen printer or KDS? (2) Can the owner create a Square Developer app, or add the developer to the account team, so we can use sandbox credentials first? Never send passwords or tokens by chat or email. (3) OK to enter the menu in Square as items with sizes and extras (we can script it for the owner to review)? | Square becomes the menu, order and payment system (ADR-0014, proposed) | Blocking for online ordering |
+| F17 | **Delivery edge cases:** (1) If Uber's fee at booking is higher than the fee the customer paid, should the shop absorb up to A$2, and above that call the customer or cancel with a full refund? (2) If the courier can't reach the customer, leave the food at the door or return it to the shop (Uber charges 50% of the fee for returns)? | Money flow and customer experience for delivery (ADR-0015, proposed) | Blocking for delivery |
 
 ## Still open from the original list
 
 | # | Question | Priority |
 |---|---|---|
-| Q1 | POS choice (when decided). Also: would you like our recommendation on a POS with good online-ordering support? | Important (no longer blocks launch thanks to the order board) |
+| Q1 | POS choice. **31 Oct 2026: the project lead asked for Square POS + Uber Direct.** Owner to confirm (ADR-0014, F16) | Important: decides the order flow (docs/design/SQUARE-UBER-INTEGRATION.md) |
 | Q6 | Legal entity: Valam Enterprise Pty Ltd, ABN 31 696 781 405? Who signs up for the payment account? | Blocking for payments |
 | Q10 | Allergen and dietary information per item | Launch blocker |
 | Q11 | Budget range for the build and monthly running costs. Target launch date? | Important |

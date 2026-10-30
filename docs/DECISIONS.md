@@ -89,3 +89,32 @@ ADR-0001 to ADR-0007 were **Confirmed on 15 Oct 2026** by the project lead (appr
 - Before launch: replace the text "Google" attribution with Google's official logo asset per the Places attribution guidelines.
 - Revisit when: traffic makes taps exceed the free tier, or Google changes the terms or pricing.
 
+## ADR-0014: Square POS for menu, orders and payments; staff use Square Order Manager
+- Status: **Proposed (31 Oct 2026), awaiting the owner's approval.** If confirmed: answers Q1, supersedes ADR-0003 (P3 staff board) and the Stripe default in ADR-0004. The capture timing in ADR-0004 stays unless spike S0 says otherwise.
+- Context: the project lead asked to use Square's APIs for ordering, the catalogue and status, instead of building those ourselves. Plan: [design/SQUARE-UBER-INTEGRATION.md](design/SQUARE-UBER-INTEGRATION.md).
+- Decision:
+  - The **Square catalogue** is the source of items, prices, choices and sold-out. The website keeps photos and presentation, keyed by Square ID.
+  - **Square calculates totals.**
+  - Payments use the **Square Web Payments SDK** with delayed capture: authorise at checkout, capture on accept, void on decline/timeout.
+  - Web orders go to Square as **PICKUP** fulfilments and are handled by staff in **Square POS Order Manager**. Webhooks drive our status page and emails.
+  - **Online ordering hours and pauses stay on the website.**
+- Verified facts (31 Oct 2026):
+  - API orders show in POS once they have a fulfilment and are paid.
+  - Online delayed capture holds for up to 7 days.
+  - Apps can read sold-out but not set it.
+  - The DELIVERY fulfilment is closed beta for approved partners only.
+  - The Square AU online rate is 2.2%.
+- Unknown until spike S0: whether an authorised-only order is visible in Order Manager. If not, the choice is charge-at-checkout + refund-on-decline (owner decision D4).
+- Consequences: no custom staff board, menu editor, sold-out toggles, refund screens or Stripe integration. Staff use one system. The menu is entered in Square once (scripted). Depends on Square's uptime; the menu falls back to the last synced copy.
+- Revisit when: spike S0 fails both flows, or the shop moves off Square.
+
+## ADR-0015: Uber Direct delivery booked by the website when staff accept a Square order
+- Status: **Proposed (31 Oct 2026), awaiting the owner's approval.** Refines ADR-0005 (still Confirmed: Uber Direct, customer pays the fee).
+- Decision:
+  - **Checkout:** the server quotes Uber Direct and the fee is shown before payment. The fee goes on the Square order as a "Delivery (Uber Direct)" service charge, so Square's total matches the charge.
+  - **On acceptance:** after the Square webhook and the capture, the server creates the Uber delivery (idempotency key = our order ID, ready time = now + prep time).
+  - The order goes to Square as a PICKUP collected by the courier, because Square's DELIVERY fulfilment isn't available to us. Fallback: SHIPMENT.
+  - Uber webhooks (HMAC verified) and polling update the customer's status page.
+- Open (F17): who absorbs fee drift between quote and booking (recommended: shop up to A$2); leave-at-door vs return for undeliverable food. F2 (minimum order, maximum distance) and F3 (API access) are still required.
+- Revisit when: Square opens DELIVERY fulfilments to single merchants, or Square/Uber offer a native POS integration in AU.
+
