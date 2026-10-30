@@ -11,13 +11,10 @@ minimumReleaseAge: 4320
 overrides:
   "glob@>=10.2.0 <10.5.0": "^10.5.0" # GHSA-5j98-mcp5-4vw2, via @opennextjs/aws > @node-minify/core
   "undici@>=7.0.0 <7.30.1": "^7.30.1" # GHSA-xjj6-f33q-929c, -4qv8-2p9j-2685, -f72v-6w45-q472 (24 Oct), via wrangler > miniflare
+  "body-parser@>=2.0.0 <2.4.0": "^2.4.0" # GHSA-27r3-jxmh-p828 (31 Oct), via @opennextjs/aws > express
 
 # Reviewed audit exceptions: build/dev tooling only, never in the Worker bundle. Re-check on every bump.
 auditConfig:
   ignoreGhsas:
     - GHSA-67mh-4wv8-2f99 # esbuild 0.18 dev-server CORS, via drizzle-kit > @esbuild-kit; we never run esbuild's server
     - GHSA-vfj7-8cjw-p6xm # braces ReDoS, via eslint-config-next (lint only); no patched release exists
-    # body-parser 2.3.0 DoS, via @opennextjs/aws > express (AWS/Node adapter; not in the Worker bundle, checked 24 Oct).
-    # Patched 2.4.0 was published 22 Oct and is blocked by minimumReleaseAge until 25 Oct: then add an override
-    # ("body-parser@>=2.0.0 <2.4.0": "^2.4.0") and remove this line.
-    - GHSA-27r3-jxmh-p828
