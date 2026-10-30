@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { CartButton } from "./cart/cart-button";
 import { HeaderHeight } from "./header-height";
+import { MobileMenu } from "./mobile-menu";
 import { StatusChip } from "./status-chip";
 
+/** All links, shown in a row from md. On phones only Menu stays in the row; the rest go under "More". */
 const NAV = [
-  { href: "/menu", label: "Menu", wide: false },
-  { href: "/visit", label: "Visit", wide: false },
-  // Phones keep the header to one row; Franchise is in the footer there.
-  { href: "/franchise", label: "Franchise", wide: true },
-] as const;
+  { href: "/menu", label: "Menu", always: true },
+  { href: "/visit", label: "Visit", always: false },
+  { href: "/merch", label: "Merch", always: false },
+  { href: "/franchise", label: "Franchise", always: false },
+];
 
 /** Sticky on every page: brand, main links and the live status, on the lightest cream. */
 export function SiteHeader() {
@@ -21,7 +23,8 @@ export function SiteHeader() {
         Skip to content
       </a>
       <header id="site-header" className="bg-header border-brand sticky top-0 z-30 border-b-[3px]">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-2 px-3 sm:gap-x-6 sm:px-6">
+        {/* relative: anchors the phone "More" panel to the header's full width */}
+        <div className="relative mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-2 px-3 sm:gap-x-6 sm:px-6">
           <Link href="/" className="inline-flex min-h-14 shrink-0 items-center gap-2 py-1" aria-label="Chai Tapri home">
             {/* Logo files from `pnpm brand` (sized for 4× screens); plain <img>: nothing to optimise. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -33,16 +36,17 @@ export function SiteHeader() {
           <nav aria-label="Main" className="-mr-2 ml-auto flex items-center sm:mr-0">
             <ul className="flex gap-1">
               {NAV.map((item) => (
-                <li key={item.href} className={item.wide ? "hidden md:block" : undefined}>
+                <li key={item.href} className={item.always ? undefined : "hidden md:block"}>
                   <Link
                     href={item.href}
-                    className="inline-flex min-h-12 items-center px-3 font-semibold hover:underline"
+                    className="inline-flex min-h-12 items-center px-2 font-semibold hover:underline sm:px-3"
                   >
                     {item.label}
                   </Link>
                 </li>
               ))}
             </ul>
+            <MobileMenu items={NAV.filter((i) => !i.always)} />
             <CartButton />
           </nav>
         </div>

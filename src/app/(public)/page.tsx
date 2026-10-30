@@ -64,7 +64,7 @@ function PhotoSign({ menuItem, tilt }: { menuItem: MenuItem; tilt: string }) {
   const photo = photoFor(menuItem);
   const from = menuItem.price.kind === "choice";
   return (
-    <li className={`tin tin-paper flex flex-col p-3 transition-transform duration-300 hover:rotate-0 ${tilt}`}>
+    <li className={`tin tin-paper flex flex-col p-2 transition-transform duration-300 hover:rotate-0 sm:p-3 ${tilt}`}>
       {photo ? (
         <div className="bg-surface relative aspect-square overflow-hidden rounded-lg">
           <Image
@@ -76,9 +76,9 @@ function PhotoSign({ menuItem, tilt }: { menuItem: MenuItem; tilt: string }) {
           />
         </div>
       ) : null}
-      <div className="flex flex-1 flex-col gap-3 px-1 pt-4 pb-1">
-        <h3 className="font-sign text-3xl">{menuItem.name}</h3>
-        <div className="mt-auto flex items-center justify-between gap-3">
+      <div className="flex flex-1 flex-col gap-3 px-1 pt-3 pb-1 sm:pt-4">
+        <h3 className="font-sign text-2xl sm:text-3xl">{menuItem.name}</h3>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3">
           <span className="bg-mustard text-ink inline-block -rotate-3 rounded px-2 py-1 font-bold tabular-nums">
             {from ? "from " : ""}
             {formatPrice(lowestPriceCents(menuItem))}
@@ -170,7 +170,7 @@ export default function Home() {
           <p className="text-ink-soft mt-2 max-w-md">
             The ones regulars come back for. Add them straight to your order.
           </p>
-          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-10 grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-8 lg:grid-cols-4">
             {START_HERE.map((slug, i) => (
               <PhotoSign key={slug} menuItem={item(slug)} tilt={TILTS[i]} />
             ))}

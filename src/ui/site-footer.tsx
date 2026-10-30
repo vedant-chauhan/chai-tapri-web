@@ -39,7 +39,10 @@ export function SiteFooter() {
           <p className="-ml-2.5">
             <InstagramLink url={BUSINESS.instagram.url} handle={BUSINESS.instagram.handle} />
           </p>
-          <p>
+          <p className="flex flex-wrap gap-x-5">
+            <Link href="/merch" className="inline-flex min-h-11 items-center underline">
+              Merch
+            </Link>
             <Link href="/franchise" className="inline-flex min-h-11 items-center underline">
               Franchise with us
             </Link>

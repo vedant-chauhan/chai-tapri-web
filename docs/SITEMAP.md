@@ -24,7 +24,8 @@ All content below is `[Recommendation]` unless noted.
 /franchise              Franchise: why Chai Tapri, how it works, register interest (Google Form; added 29 Oct 2026, client request)
 /admin/...              Staff area (noindex, auth required)
 404 / 500 / closed states
-Later: /shop (merchandise), /catering, /account
+/merch                  Merch: "coming soon" placeholder (31 Oct 2026); products join the menu cart later (F15)
+Later: /catering, /account
 ```
 
 **Navigation (desktop):** wordmark · Menu · Our Story · Visit · [Order now] (one accent button). Header shows open status: "Open · until 1am" / "Closed · opens Wed 11am".
@@ -77,5 +78,5 @@ Privacy Policy, Terms & Conditions (ordering, payment, cancellations, refunds pe
 Dashboard (today's orders, status, ordering on/off) · Orders · Menu & availability · Hours & closures · Notices · Settings (fulfilment, delivery radius/min order, slot capacity) · Integrations health · Staff & roles · Audit log.
 
 ## Build status (29 Oct 2026)
-Built locally: `/` (playful "tapri wall" home), `/menu` (browse + add to order), `/visit` (hours, contact, embedded map), `/checkout` (step 1 "Your order" review with pickup details; steps 2–4 arrive with Stripe checkout), `/franchise` (draft copy, form slot with contact fallback, CLIENT_QUESTIONS F14). Not yet: `/order/[token]`, `/about`, legal pages.
+Built locally: `/` (playful "tapri wall" home), `/menu` (browse + add to order), `/visit` (hours, contact, embedded map), `/checkout` (step 1 "Your order" review with pickup details; steps 2–4 arrive with Stripe checkout), `/franchise` (draft copy, form slot with contact fallback, CLIENT_QUESTIONS F14), `/merch` (coming soon, F15). Phones: Menu in the header row, Visit/Merch/Franchise/Instagram under "More". Not yet: `/order/[token]`, `/about`, legal pages.
 
