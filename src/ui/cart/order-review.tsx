@@ -75,7 +75,7 @@ export function OrderReview() {
                 aria-describedby="pay-soon"
                 className="bg-accent text-accent-ink min-h-12 cursor-not-allowed rounded-full px-6 text-lg font-bold opacity-60"
               >
-                Pay online · coming soon
+                Pay online · soon
               </button>
               <p id="pay-soon" className="tin tin-mustard px-4 py-3 text-sm font-semibold">
                 Online payment opens soon. For now, show this screen at the counter and we&apos;ll make it for you.

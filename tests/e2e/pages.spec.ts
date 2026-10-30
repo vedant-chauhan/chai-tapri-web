@@ -183,7 +183,7 @@ test("checkout: reviews the order with pickup details; payment is clearly 'comin
   const main = page.locator("#main"); // the (closed) cart drawer holds the same lines
   await expect(main.getByText("Extra cheese", { exact: true })).toBeVisible();
   await expect(main.getByText("$18.47")).toBeVisible(); // 2 × 4.49 + (7.49 + 2.00)
-  await expect(page.getByRole("button", { name: "Pay online · coming soon" })).toHaveAttribute("aria-disabled", "true");
+  await expect(page.getByRole("button", { name: "Pay online · soon" })).toHaveAttribute("aria-disabled", "true");
   await expect(page.getByRole("heading", { name: "Pickup" })).toBeVisible();
   await expect(page.getByRole("button", { name: /View your order/ })).toHaveCount(0); // no floating bar here
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
@@ -220,4 +220,53 @@ test("franchise page: facts, steps, form slot with contact fallback, and the leg
     .analyze();
   expect(results.violations).toEqual([]);
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Franchise with us" })).toBeVisible();
+});
+
+test.describe("navigation by screen size", () => {
+  test("phones: Menu stays in the header; Visit, Merch and Franchise are under More", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/");
+    const header = page.locator("#site-header");
+    await expect(header.getByRole("link", { name: "Menu", exact: true })).toBeVisible();
+    await expect(header.getByRole("link", { name: "Franchise" }).first()).toBeHidden();
+
+    const more = header.getByRole("button", { name: "More" });
+    await expect(more).toHaveAttribute("aria-expanded", "false");
+    await more.click();
+    await expect(more).toHaveAttribute("aria-expanded", "true");
+    for (const name of ["Visit", "Merch", "Franchise"]) {
+      await expect(header.getByRole("link", { name, exact: true }).last()).toBeVisible();
+    }
+    await page.keyboard.press("Escape");
+    await expect(more).toHaveAttribute("aria-expanded", "false");
+
+    await more.click();
+    await header.getByRole("link", { name: "Franchise", exact: true }).last().click();
+    await expect(page).toHaveURL(/\/franchise$/);
+    await expect(more).toHaveAttribute("aria-expanded", "false"); // closes after navigating
+  });
+
+  test("larger screens: all four links in the header, no More button", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Main" });
+    for (const name of ["Menu", "Visit", "Merch", "Franchise"]) {
+      await expect(nav.getByRole("link", { name, exact: true }).first()).toBeVisible();
+    }
+    await expect(nav.getByRole("button", { name: "More" })).toBeHidden();
+  });
+});
+
+test("merch page: honest coming-soon, no invented products, accessible", async ({ page }) => {
+  await page.goto("/merch");
+  await expect(page.getByRole("heading", { level: 1, name: "Something's brewing" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Order from the menu" })).toHaveAttribute("href", "/menu");
+  await expect(page.getByRole("main").getByRole("link", { name: /Instagram/ })).toBeVisible();
+  await expect(page.getByRole("main").getByRole("button", { name: /^Add / })).toHaveCount(0);
+  const results = await new AxeBuilder({ page })
+    .exclude("iframe")
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merch" })).toBeVisible();
 });
