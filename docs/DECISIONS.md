@@ -90,7 +90,8 @@ ADR-0001 to ADR-0007 were **Confirmed on 15 Oct 2026** by the project lead (appr
 - Revisit when: traffic makes taps exceed the free tier, or Google changes the terms or pricing.
 
 ## ADR-0014: Square POS for menu, orders and payments; staff use Square Order Manager
-- Status: **Proposed (31 Oct 2026), awaiting the owner's approval.** If confirmed: answers Q1, supersedes ADR-0003 (P3 staff board) and the Stripe default in ADR-0004. The capture timing in ADR-0004 stays unless spike S0 says otherwise.
+- Status: **Confirmed for pickup orders: owner approval relayed by the project lead, 14 Nov 2026.** Answers Q1. Supersedes ADR-0003 (P3 staff board) and the Stripe default in ADR-0004. The capture timing in ADR-0004 stays unless spike S0 says otherwise; the fallback (D4) needs separate owner approval. Delivery is ADR-0015 (still Proposed).
+- Connection: **OAuth**, because the developer owns the Square app. Permissions: ITEMS_READ, MERCHANT_PROFILE_READ, ORDERS_READ/WRITE, PAYMENTS_READ/WRITE. Tokens encrypted at rest and renewed by the sweep. One new table, `square_integrations`.
 - Context: the project lead asked to use Square's APIs for ordering, the catalogue and status, instead of building those ourselves. Plan: [design/SQUARE-UBER-INTEGRATION.md](design/SQUARE-UBER-INTEGRATION.md).
 - Decision:
   - The **Square catalogue** is the source of items, prices, choices and sold-out. The website keeps photos and presentation, keyed by Square ID.
