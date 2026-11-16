@@ -1,6 +1,6 @@
 # Square POS + Uber Direct: Integration Plan
 
-Status: **Proposed, 31 Oct 2026. Needs the owner's approval** (POS path, payment provider and money flow are approval gates). Nothing here is built until ADR-0014 and ADR-0015 are `Confirmed`.
+Status: **Square for pickup orders: Confirmed by the owner, 14 Nov 2026** (relayed by the project lead; ADR-0014). Connection by OAuth, because the Square developer app is in the developer's account (§6). **Delivery (Uber Direct, ADR-0015): still Proposed.** D4 still needs the owner's approval if spike S0 gives result B.
 Builds on: [INTEGRATIONS.md](../INTEGRATIONS.md) §2–4 (research of 14 Oct) · ADR-0003, ADR-0004, ADR-0005 · [SLICE-01-pickup-ordering.md](SLICE-01-pickup-ordering.md).
 Facts checked 31 Oct 2026 against Square and Uber developer docs and the Square developer forum. Labels as in CLAUDE.md.
 
@@ -111,10 +111,11 @@ sequenceDiagram
 ## 6. What the owner needs to set up (no passwords or keys in chat or email)
 
 1. **Square account** on the shop's ABN (Q6). POS plan: Free works for Order Manager + printer `[Inference — confirm]`; a KDS screen needs Square for Restaurants Plus `[Verified, 14 Oct]`.
-2. **Square Developer app** (developer.squareup.com), created by the owner or with the developer added to the account team.
-   - Sandbox credentials first.
-   - Production access token with the minimum permissions: ITEMS_READ, ORDERS_READ/WRITE, PAYMENTS_READ/WRITE, INVENTORY_READ, MERCHANT_PROFILE_READ.
-   - Stored as Wrangler secrets.
+2. **Connection (updated 14 Nov 2026): OAuth.** The developer created the Square developer account and app, so the app can only reach the shop's Square account through OAuth. A personal access token only works for the app owner's own account.
+   - The owner signs in to Square from the website's owner-only "Connect Square" page and approves these permissions: ITEMS_READ, MERCHANT_PROFILE_READ, ORDERS_READ, ORDERS_WRITE, PAYMENTS_READ, PAYMENTS_WRITE. Nothing else is requested.
+   - Tokens are stored encrypted (AES-GCM, key as a Wrangler secret) in one `square_integrations` table. The minute-sweep renews them before they expire, and an `oauth.authorization.revoked` webhook marks the connection as disconnected.
+   - The application secret and webhook signature keys stay as Wrangler secrets, never in the database, chat or screenshots.
+   - Sandbox: the developer's own sandbox test account, with no client involvement. Production OAuth and webhooks need a public HTTPS address, so Cloudflare staging (F4-8 to F4-12) comes before S2.
 3. **Enter the menu in Square**, item by item, with sizes (Cutting/Regular, Raw/Grilled) as variations and extras as modifier lists. We can script this from `src/domain/menu.ts` with the Catalog API, so the owner only reviews it `[Recommendation]`.
 4. **Uber Direct Developer tab** (F3): Customer ID, Client ID/Secret and a webhook signing key, test mode first.
 
@@ -133,9 +134,9 @@ Each step meets the definition of done: server rules, tests for happy/edge/failu
 
 | # | Decision | Recommendation |
 |---|---|---|
-| D1 | **Square is the shop's POS and the website's payment provider** (answers Q1; replaces the Stripe default in ADR-0004) | Yes. One system for menu, orders, payments and reports. 2.2% online `[Verified, Square AU help]` |
-| D2 | **Staff handle web orders in Square POS Order Manager**, not a custom board (supersedes ADR-0003's P3) | Yes, subject to spike S0 |
-| D3 | **Menu and prices are edited in Square**, and the website follows | Yes |
+| D1 | **Square is the shop's POS and the website's payment provider** (answers Q1; replaces the Stripe default in ADR-0004) | **Confirmed 14 Nov 2026** (pickup orders) |
+| D2 | **Staff handle web orders in Square POS Order Manager**, not a custom board (supersedes ADR-0003's P3) | **Confirmed 14 Nov 2026**, subject to spike S0 |
+| D3 | **Menu and prices are edited in Square**, and the website follows | **Confirmed 14 Nov 2026** |
 | D4 | If spike S0 gives result B: **charge at checkout, refund on decline** | Decide after S0 |
 | D5 | **Delivery fee drift:** the quote is fixed at checkout, but the delivery is booked at acceptance and Uber's fee may differ | Shop absorbs up to A$2. Above that, staff call the customer or cancel with a full refund (F17) |
 | D6 | **Undeliverable food:** return to the shop (Uber's default, charges a 50% return fee) or leave at door | Leave at door for food, matching the drop-off note at checkout (F17) |
@@ -145,3 +146,27 @@ Each step meets the definition of done: server rules, tests for happy/edge/failu
 - Square developer forum: "Australian restaurant app: DELIVERY partner access and Square/Nash delivery data" (Sep 2026).
 - Square AU help: fees and payments FAQ (2.2% online).
 - Uber Direct: Authentication (token 30 days, `eats.deliveries`, 100 token requests/hour), Webhooks (signature, retries), Robocourier (developer.uber.com/docs/deliveries); Uber × Square partner page (merchants.uber.com).
+
+## 10. Pickup go-ahead (14 Nov 2026): our steps and the client checklist
+
+**Our side first (no client needed):**
+1. In the developer's Square account: create the "Chai Tapri Web" app, pin the API version, and keep sandbox credentials in `.env.local` only.
+2. **Spike S0** in the sandbox test account:
+   - load our menu into the sandbox catalogue (script);
+   - create a PICKUP order with a delayed-capture test payment;
+   - check what the sandbox Seller Dashboard shows;
+   - try capture and void.
+   Whether the sandbox shows Order Manager the way the real POS app does is `[Unknown]`, so one real low-value order is planned in the client's test window (item 7 below), then voided or refunded.
+3. Build the OAuth "Connect Square" flow against the sandbox, and the catalogue sync (S1).
+4. Prepare a menu review sheet: how each board item, size and extra will look in Square, for the owner to tick off.
+5. Set up Cloudflare staging (F4-8 to F4-12) before S2, because webhooks and production OAuth need a public HTTPS address.
+
+**Checklist for the owner (send once, as one message):**
+1. **Account:** Is Square already in use in the shop? Which plan (Square POS Free, Plus, Square for Restaurants)? Is the account in the business's legal name and ABN (Q6), and is it verified for **online** payments with a bank account for payouts?
+2. **Counter set-up:** Which device runs Square POS (iPad, Square Register, phone)? Is there a docket or kitchen printer, or a KDS screen? Web orders appear in **Order Manager** and print as dockets.
+3. **Menu in Square:** Is the menu already in the Square item library? If yes, do names and prices match the board (MENU.md)? From now on **Square prices are the website prices**. We map sizes (Cutting/Regular, Raw/Grilled) as variations and extras as modifiers. Combos are still open (F11).
+4. **GST:** How is GST set up in Square today (prices include GST? any items GST-free)? Confirm with the shop's accountant; we don't decide tax treatment.
+5. **Workflow:** Staff accept each web order in Order Manager within 5 minutes (F7), the default prep time (F4), who may pause ordering (F13), and staff marking items **sold out in Square** so the website follows.
+6. **Payments:** OK with Square's 2.2% online fee? And **D4**: if the test shows a held (not yet charged) order can't appear in Order Manager, may we charge at checkout and refund automatically when an order is declined?
+7. **Connecting and testing:** The **account owner** (or an admin with the right access) clicks "Connect Square" on the website and approves the permissions; we never need their password or codes. Agree a 20-minute test window for one real small order, which is then refunded.
+8. **Still open for launch:** legal entity and ABN (Q6), allergens (Q10), privacy, terms and refund policy text (approval gate), and other integrations already on the account (e.g. Uber Eats via Square).
