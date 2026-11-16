@@ -38,7 +38,7 @@ const CHAI_101 = [
     tone: "tin-mustard",
     tilt: "sm:rotate-1 sm:translate-y-6",
     word: "Tapri",
-    text: "The tiny roadside chai stall found on street corners all over India. This one happens to be on William Street.",
+    text: "The tiny roadside chai stall found on street corners all over India. This one happens to be on William Street, Perth.",
     href: "/visit",
   },
   {

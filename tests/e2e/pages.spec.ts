@@ -270,3 +270,17 @@ test("merch page: honest coming-soon, no invented products, accessible", async (
   expect(results.violations).toEqual([]);
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Merch" })).toBeVisible();
 });
+
+test("logo on the home page glides back to the top; elsewhere it goes home", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText(/happens to be on William Street, Perth\./)).toBeVisible();
+  await page.mouse.wheel(0, 2500);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+  await page.getByRole("link", { name: "Chai Tapri home" }).click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page).toHaveURL(/\/$/);
+
+  await page.goto("/visit");
+  await page.getByRole("link", { name: "Chai Tapri home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+});
