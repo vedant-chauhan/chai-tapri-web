@@ -59,12 +59,14 @@ test("Google reviews load on tap, with attribution, rating and links", async ({ 
 });
 
 test("without a Google key: no button, just the verified rating and a link to Google", async ({ page }) => {
+  // Listen before navigating: the status check can answer before the page has finished loading.
+  const status = page.waitForResponse("**/api/v1/reviews/status");
   await page.goto("/");
   const section = page.locator("section[aria-labelledby='reviews']");
   await expect(section.getByText(/from 197 Google reviews \(October 2026\)/)).toBeVisible();
   await expect(section.getByRole("link", { name: "Read all reviews on Google" })).toBeVisible();
   // The status check has answered "not configured", so the button never appears.
-  await page.waitForResponse("**/api/v1/reviews/status").catch(() => {});
+  expect(await (await status).json()).toEqual({ configured: false });
   await expect(section.getByRole("button", { name: "Show Google reviews" })).toHaveCount(0);
 });
 
